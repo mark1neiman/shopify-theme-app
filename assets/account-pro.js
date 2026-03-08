@@ -131,6 +131,7 @@
 
   function bindTabs(root) {
     const buttons = Array.from(root.querySelectorAll("[data-account-tab-target]"));
+    const links = Array.from(root.querySelectorAll("[data-account-tab-link]"));
     const panels = Array.from(root.querySelectorAll("[data-account-tab-panel]"));
     if (!buttons.length || !panels.length) return;
 
@@ -144,7 +145,7 @@
         const active = panel.getAttribute("data-account-tab-panel") === tab;
         panel.classList.toggle("is-active", active);
       });
-      if (history.replaceState) history.replaceState(null, "", `#${tab}`);
+      if (history.replaceState) history.replaceState(null, "", `${location.pathname}${location.search}#${tab}`);
     };
 
     buttons.forEach((btn) => {
@@ -153,7 +154,18 @@
       });
     });
 
-    const requestedTab = String(location.hash || "").replace("#", "").trim();
+    links.forEach((link) => {
+      link.addEventListener("click", (event) => {
+        const tab = String(link.getAttribute("data-account-tab-link") || "").trim();
+        if (!tab) return;
+        event.preventDefault();
+        activate(tab);
+      });
+    });
+
+    const hashTab = String(location.hash || "").replace("#", "").trim();
+    const defaultTab = String(root.getAttribute("data-account-default-tab") || "").trim();
+    const requestedTab = hashTab || defaultTab;
     const hasRequested = buttons.some((btn) => btn.getAttribute("data-account-tab-target") === requestedTab);
     activate(hasRequested ? requestedTab : buttons[0].getAttribute("data-account-tab-target"));
   }

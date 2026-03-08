@@ -15,9 +15,17 @@
     <script src="{{ 'gift-wrapping.js' | asset_url }}" defer="defer"></script>
   {%- endif -%}
 
+  {%- liquid
+    assign drawer_ship_country_label = localization.country.name | default: localization.country.iso_code | default: 'your country'
+    assign drawer_ship_zip_label = ''
+    if customer and customer.default_address and customer.default_address.zip != blank
+      assign drawer_ship_zip_label = customer.default_address.zip
+    endif
+  -%}
+
   <cart-drawer
     id="CartDrawer"
-    class="drawer cart-drawer drawer--right"
+    class="drawer cart-drawer cart-drawer--iherb drawer--right"
     data-section-id="{{ section.id }}"
     shopify-design-mode
     hidden
@@ -51,6 +59,9 @@
                 )
               </cart-count>
             </h2>
+            <div class="cart-drawer__ship-pill">
+              Ship to {{ drawer_ship_country_label }}{% if drawer_ship_zip_label != blank %}, {{ drawer_ship_zip_label }}{% endif %}
+            </div>
             <button
               class="drawer__close-btn z-1 static"
               aria-controls="CartDrawer"
@@ -120,6 +131,7 @@
               render 'free-shipping-goal', minimum_amount: minimum_amount, classes: 'w-full'
             endif
           -%}
+          <div class="cart-drawer__campaigns" data-mk-applied-campaigns style="display:none;"></div>
           <div
             id="CartDrawerBody-{{ section.id }}"
             class="flex flex-col gap-6 flex-grow{% if cart == empty %} hidden{% endif %}"
@@ -522,7 +534,15 @@
           id="CartDrawerFooter-{{ section.id }}"
           class="drawer__footer cart-drawer__footer grid gap-3{% if cart == empty %} hidden{% endif %}"
         >
-          <div class="drawer__footer-head grid gap-4">
+          <div class="drawer__footer-head grid">
+            {%- for block in section.blocks -%}
+              {%- case block.type -%}
+                {%- when '@app' -%}
+                  <div class="cart-drawer__app-block" {{ block.shopify_attributes }}>
+                    {%- render block -%}
+                  </div>
+              {%- endcase -%}
+            {%- endfor -%}
             {%- render 'gift-wrapping',
               section_id: section.id,
               gift_wrapping: gift_wrapping,
@@ -531,65 +551,11 @@
               items_in_cart: items_in_cart,
               class: 'text-sm'
             -%}
-            {%- if section.settings.show_cart_note or section.settings.show_shipping_rates_calculator or section.settings.show_cart_coupon -%}
+            {%- if section.settings.show_shipping_rates_calculator or section.settings.show_cart_coupon -%}
               <div is="swipe-wrapper" class="cart-drawer__addons min-w-0 swipe--with-shadow">
                 <div class="swipe__element swipe-all disable-scroll-snap">
                   <div class="swipe-all__inner">
                     <div class="inline-flex flex-nowrap gap-2">
-                      {%- if section.settings.show_cart_note -%}
-                        <button
-                          type="button"
-                          class="btn btn--secondary btn--small font-body flex gap-2 items-center justify-center"
-                          aria-controls="CartNote-{{ section.id }}"
-                          aria-expanded="false"
-                        >
-                          <span class="btn__text flex gap-1 items-center">
-                            {{ 'general.cart.note.title' | t }}
-                            {%- render 'icon-caret-right', size: 'extra-small' -%}
-                          </span>
-                        </button>
-                        <cart-addon-modal
-                          id="CartNote-{{ section.id }}"
-                          class="drawer cart-addons-drawer drawer--bottom"
-                          hidden
-                        >
-                          <div class="fixed-overlay absolute" aria-controls="CartNote-{{ section.id }}"></div>
-                          <div class="drawer__inner">
-                            <button
-                              aria-controls="CartNote-{{ section.id }}"
-                              class="drawer__close-btn z-1"
-                              aria-label="{{ 'accessibility.close' | t }}"
-                            >
-                              {%- render 'icon-close' -%}
-                            </button>
-                            <div class="drawer__content cart-addons-drawer__content grid gap-5">
-                              <h5>{{ 'general.cart.note.title' | t }}</h5>
-                              <cart-note class="flex flex-col items-start gap-5">
-                                <div class="form-field w-full">
-                                  <textarea
-                                    name="note"
-                                    class="form-control form-control--textarea"
-                                    rows="5"
-                                    placeholder="{{ 'general.cart.note.caption' | t }}"
-                                    id="CartNoteForm-{{ section.id }}"
-                                  >{{ cart.note }}</textarea>
-                                  <label class="visually-hidden" for="CartNoteForm-{{ section.id }}">
-                                    {{- 'general.cart.note.title' | t -}}
-                                  </label>
-                                </div>
-                                <button
-                                  class="btn btn--primary w-full"
-                                  type="button"
-                                  aria-controls="CartNote-{{ section.id }}"
-                                  aria-expanded="false"
-                                >
-                                  <span class="btn__text">{{ 'general.cart.note.button' | t }}</span>
-                                </button>
-                              </cart-note>
-                            </div>
-                          </div>
-                        </cart-addon-modal>
-                      {%- endif -%}
                       {%- if section.settings.show_shipping_rates_calculator -%}
                         <button
                           type="button"
@@ -763,6 +729,12 @@
           </div>
           <div class="drawer__footer-body">
             <div class="grid gap-5">
+              <div
+                id="CartDrawer-PricingBreakdown"
+                class="cart-drawer__pricing-breakdown"
+                data-mk-pricing-breakdown
+                style="display:none;"
+              ></div>
               <div class="grid gap-1">
                 {%- liquid
                   assign discount_codes = cart.cart_level_discount_applications | where: 'type', 'discount_code' | map: 'title'
@@ -861,13 +833,11 @@
                   -%}
                 </div>
               </div>
-<div class="drawer__footer-buttons flex gap-2">
-  <a href="{{ routes.cart_url }}" class="btn btn--primary w-full">
-    <span class="btn__text">
-      {{ 'general.cart.view_empty_cart' | t }}
-    </span>
-  </a>
-</div>
+              <div class="drawer__footer-buttons grid gap-2">
+                <a href="{{ routes.cart_url }}" class="btn btn--primary w-full">
+                  <span class="btn__text">{{ 'general.cart.view_empty_cart' | t }}</span>
+                </a>
+              </div>
 
             </div>
           </div>
@@ -880,16 +850,15 @@
 {% schema %}
 {
   "name": "t:sections.cart-drawer.name",
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
   "settings": [
     {
       "type": "header",
       "content": "t:general.general.name"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_cart_note",
-      "label": "t:sections.cart-drawer.settings.show_cart_note.label",
-      "default": true
     },
     {
       "type": "checkbox",

@@ -4,162 +4,200 @@
   {%- assign hide_shop_login_button = true -%}
 {%- endif -%}
 
+{%- assign recover_success = false -%}
+
 <div
-  class="customer login section section--padding"
+  class="customer login login--split section section--padding"
   style="--section-padding-top: {{ section.settings.padding_top }}px;--section-padding-bottom: {{ section.settings.padding_bottom }}px;"
 >
   <div class="section__wrapper">
-    <h1 id="recover" tabindex="-1" class="text-center h2">
-      {{- 'customer.recover_password.title' | t -}}
-    </h1>
-    <div>
-      <p class="text-center text-subtext">
-        {{- 'customer.recover_password.subtext' | t -}}
-      </p>
-
-      {%- form 'recover_customer_password', class: 'flex flex-col' -%}
-        {% assign recover_success = form.posted_successfully? %}
-        <div class="form-field">
-          <label for="RecoverEmail" class="form-label">
-            {{ 'customer.login_page.email' | t }}
-          </label>
-          <input
-            required
-            type="email"
-            value=""
-            name="email"
-            id="RecoverEmail"
-            autocorrect="off"
-            autocapitalize="off"
-            autocomplete="email"
-            {% if form.errors %}
-              aria-invalid="true"
-              aria-describedby="RecoverEmail-email-error"
-              autofocus
-            {% endif %}
-            placeholder="{{ 'customer.login_page.email' | t }}"
-            class="form-control"
-          >
-          {%- if form.errors -%}
-            <span id="RecoverEmail-email-error" class="form-message form-message--small form-message--error">
-              {% render 'icon-error', size: 'small' %}
-              {{ form.errors.messages.form }}
-            </span>
-          {%- endif -%}
-        </div>
-
-        <button class="btn btn--primary w-full" type="submit">
-          <span class="btn__text">{{ 'customer.login_page.submit' | t }}</span>
-        </button>
-
-        <a href="#login" class="btn btn--underline self-center">
-          {{ 'customer.login_page.cancel' | t }}
-        </a>
-      {%- endform -%}
-    </div>
-
-    <h1 id="login" tabindex="-1" class="text-center h2">
-      {{- 'customer.login_page.title' | t -}}
-    </h1>
-    <div>
-      <p class="text-center text-subtext">If you have an account with us, please log in.</p>
-      {%- if recover_success == true -%}
-        <p class="form-message m-0 alert alert--success blocks-radius" tabindex="-1" autofocus>
-          {% render 'icon-success', size: 'small' %}
-          {{ 'customer.recover_password.success' | t }}
-        </p>
-      {%- endif -%}
-      {%- form 'customer_login', class: 'flex flex-col' -%}
-        {%- if form.errors -%}
-          <div class="form-error alert alert--error blocks-radius">
-            <h2 class="form-message form-message--error h6 m-0" tabindex="-1" autofocus>
-              <span class="visually-hidden">{{ 'accessibility.error' | t }} </span>
-              {% render 'icon-error', size: 'small' %}
-              {{ 'templates.contact.form.error_heading' | t }}
-            </h2>
-            {{ form.errors | default_errors }}
+    <div class="login-shell">
+      <div class="login-card blocks-radius">
+        <div class="login-card__form-column">
+          <div class="login-card__topbar">
+            <a href="{{ routes.root_url }}" class="btn--link">{{ section.settings.back_link_label }}</a>
           </div>
-        {%- endif -%}
 
-        {%- if shop.features.login_with_shop_classic_customer_accounts? -%}
-          <section name="sign-in-with-shop-provider" class="form-field">
-            {{ shop | login_button: hide_button: hide_shop_login_button }}
+          <h1 class="h2 login-card__title">
+            {%- if section.settings.heading != blank -%}
+              {{- section.settings.heading -}}
+            {%- else -%}
+              {{- 'customer.login_page.title' | t -}}
+            {%- endif -%}
+          </h1>
 
-            {%- unless hide_shop_login_button -%}
-              <p class="text-center">
-                {{ 'customer.login_page.alternate_provider_separator' | t }}
+          <p class="login-card__subtitle text-subtext">
+            {%- if section.settings.subheading != blank -%}
+              {{- section.settings.subheading -}}
+            {%- else -%}
+              {{- 'If you have an account with us, please log in or create a new account.' -}}
+            {%- endif -%}
+          </p>
+
+          <div id="recover" tabindex="-1" class="login-panel">
+            <h2 class="h5 m-0">{{ 'customer.recover_password.title' | t }}</h2>
+            <p class="text-subtext login-panel__intro">{{ 'customer.recover_password.subtext' | t }}</p>
+
+            {%- form 'recover_customer_password', class: 'flex flex-col login-form' -%}
+              {% assign recover_success = form.posted_successfully? %}
+              <div class="form-field">
+                <label for="RecoverEmail" class="form-label">
+                  {{ 'customer.login_page.email' | t }}
+                </label>
+                <input
+                  required
+                  type="email"
+                  value=""
+                  name="email"
+                  id="RecoverEmail"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  autocomplete="email"
+                  {% if form.errors %}
+                    aria-invalid="true"
+                    aria-describedby="RecoverEmail-email-error"
+                    autofocus
+                  {% endif %}
+                  placeholder="{{ 'customer.login_page.email' | t }}"
+                  class="form-control"
+                >
+                {%- if form.errors -%}
+                  <span id="RecoverEmail-email-error" class="form-message form-message--small form-message--error">
+                    {% render 'icon-error', size: 'small' %}
+                    {{ form.errors.messages.form }}
+                  </span>
+                {%- endif -%}
+              </div>
+
+              <button class="btn btn--primary w-full" type="submit">
+                <span class="btn__text">{{ 'customer.login_page.submit' | t }}</span>
+              </button>
+
+              <a href="#login" class="btn btn--underline self-center">
+                {{ 'customer.login_page.cancel' | t }}
+              </a>
+            {%- endform -%}
+          </div>
+
+          <div id="login" tabindex="-1" class="login-panel">
+            {%- if recover_success == true -%}
+              <p class="form-message m-0 alert alert--success blocks-radius" tabindex="-1" autofocus>
+                {% render 'icon-success', size: 'small' %}
+                {{ 'customer.recover_password.success' | t }}
               </p>
-            {%- endunless -%}
-          </section>
-        {%- endif -%}
+            {%- endif -%}
 
-        <div class="form-field">
-          <label for="CustomerEmail" class="form-label">
-            {{ 'customer.login_page.email' | t }}
-          </label>
-          <input
-            required
-            type="email"
-            name="customer[email]"
-            id="CustomerEmail"
-            autocomplete="email"
-            autocorrect="off"
-            autocapitalize="off"
-            {% if form.errors contains 'form' %}
-              aria-invalid="true"
-            {% endif %}
-            placeholder="{{ 'customer.login_page.email' | t }}"
-            class="form-control"
-          >
+            {%- form 'customer_login', class: 'flex flex-col login-form' -%}
+              {%- if form.errors -%}
+                <div class="form-error alert alert--error blocks-radius">
+                  <h2 class="form-message form-message--error h6 m-0" tabindex="-1" autofocus>
+                    <span class="visually-hidden">{{ 'accessibility.error' | t }} </span>
+                    {% render 'icon-error', size: 'small' %}
+                    {{ 'templates.contact.form.error_heading' | t }}
+                  </h2>
+                  {{ form.errors | default_errors }}
+                </div>
+              {%- endif -%}
+
+              {%- if shop.features.login_with_shop_classic_customer_accounts? -%}
+                <section name="sign-in-with-shop-provider" class="form-field">
+                  {{ shop | login_button: hide_button: hide_shop_login_button }}
+
+                  {%- unless hide_shop_login_button -%}
+                    <p class="login-form__separator">{{ 'customer.login_page.alternate_provider_separator' | t }}</p>
+                  {%- endunless -%}
+                </section>
+              {%- endif -%}
+
+              <div class="form-field">
+                <label for="CustomerEmail" class="form-label">
+                  {{ 'customer.login_page.email' | t }}
+                </label>
+                <input
+                  required
+                  type="email"
+                  name="customer[email]"
+                  id="CustomerEmail"
+                  autocomplete="email"
+                  autocorrect="off"
+                  autocapitalize="off"
+                  {% if form.errors contains 'form' %}
+                    aria-invalid="true"
+                  {% endif %}
+                  placeholder="{{ 'customer.login_page.email' | t }}"
+                  class="form-control"
+                >
+              </div>
+
+              {%- if form.password_needed -%}
+                <div class="form-field">
+                  <label for="CustomerPassword" class="form-label">
+                    {{ 'customer.login_page.password' | t }}
+                  </label>
+                  <input
+                    required
+                    type="password"
+                    value=""
+                    name="customer[password]"
+                    id="CustomerPassword"
+                    autocomplete="current-password"
+                    {% if form.errors contains 'form' %}
+                      aria-invalid="true"
+                    {% endif %}
+                    placeholder="{{ 'customer.login_page.password' | t }}"
+                    class="form-control"
+                  >
+                </div>
+
+                <a href="#recover" class="btn--link self-center text-subtext mk-login__forgot">
+                  {{ 'customer.login_page.forgot_password' | t }}
+                </a>
+              {%- endif -%}
+
+              <button class="btn btn--primary w-full" type="submit">
+                <span class="btn__text">{{ 'customer.login_page.sign_in' | t }}</span>
+              </button>
+
+              <a href="{{ routes.account_register_url }}" class="btn btn--underline self-center">
+                {{ 'customer.login_page.create_account' | t }}
+              </a>
+            {%- endform -%}
+
+            {%- if shop.checkout.guest_login -%}
+              <div class="login-guest">
+                <p class="text-subtext">{{ 'customer.login_page.guest_title' | t }}</p>
+                {%- form 'guest_login' -%}
+                  <button class="btn btn--secondary w-full">
+                    <span class="btn__text">{{ 'customer.login_page.guest_continue' | t }}</span>
+                  </button>
+                {%- endform -%}
+              </div>
+            {%- endif -%}
+          </div>
         </div>
 
-        {%- if form.password_needed -%}
-          <div class="form-field">
-            <label for="CustomerPassword" class="form-label">
-              {{ 'customer.login_page.password' | t }}
-            </label>
-            <input
-              required
-              type="password"
-              value=""
-              name="customer[password]"
-              id="CustomerPassword"
-              autocomplete="current-password"
-              {% if form.errors contains 'form' %}
-                aria-invalid="true"
-              {% endif %}
-              placeholder="{{ 'customer.login_page.password' | t }}"
-              class="form-control"
-            >
-          </div>
+        <aside class="login-card__benefits" aria-label="{{ section.settings.benefits_heading }}">
+          <h2 class="h4 m-0">{{ section.settings.benefits_heading }}</h2>
 
-          <a href="#recover" class="btn--link self-start text-subtext">
-            {{ 'customer.login_page.forgot_password' | t }}
-          </a>
-        {%- endif -%}
+          <ul class="login-benefits list-unstyled" role="list">
+            {%- for index in (1..6) -%}
+              {%- assign setting_key = 'benefit_' | append: index -%}
+              {%- assign benefit_text = section.settings[setting_key] -%}
+              {%- if benefit_text != blank -%}
+                <li>
+                  <span class="login-benefits__icon" aria-hidden="true">✓</span>
+                  <span>{{ benefit_text }}</span>
+                </li>
+              {%- endif -%}
+            {%- endfor -%}
+          </ul>
 
-        <button class="btn btn--primary w-full" type="submit">
-          <span class="btn__text">{{ 'customer.login_page.sign_in' | t }}</span>
-        </button>
-
-        <a href="{{ routes.account_register_url }}" class="btn btn--underline self-center">
-          {{ 'customer.login_page.create_account' | t }}
-        </a>
-      {%- endform -%}
-    </div>
-
-    {%- if shop.checkout.guest_login -%}
-      <div>
-        <hr>
-        <h2>{{ 'customer.login_page.guest_title' | t }}</h2>
-
-        {%- form 'guest_login' -%}
-          <button class="btn btn--primary w-full">
-            <span class="btn__text">{{ 'customer.login_page.guest_continue' | t }}</span>
-          </button>
-        {%- endform -%}
+          {%- if section.settings.benefits_footer != blank -%}
+            <p class="login-card__benefits-footer text-subtext">{{ section.settings.benefits_footer }}</p>
+          {%- endif -%}
+        </aside>
       </div>
-    {%- endif -%}
+    </div>
   </div>
 </div>
 
@@ -172,6 +210,76 @@
       "id": "enable_shop_login_button",
       "label": "t:sections.main-login.shop_login_button.enable",
       "default": true
+    },
+    {
+      "type": "text",
+      "id": "back_link_label",
+      "label": "Back link label",
+      "default": "Back to store"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Sign in or create an account"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Enter your email and password to continue."
+    },
+    {
+      "type": "header",
+      "content": "Benefits column"
+    },
+    {
+      "type": "text",
+      "id": "benefits_heading",
+      "label": "Benefits heading",
+      "default": "Why shop with us?"
+    },
+    {
+      "type": "text",
+      "id": "benefit_1",
+      "label": "Benefit 1",
+      "default": "Fast order processing and delivery updates"
+    },
+    {
+      "type": "text",
+      "id": "benefit_2",
+      "label": "Benefit 2",
+      "default": "Secure checkout with trusted payment methods"
+    },
+    {
+      "type": "text",
+      "id": "benefit_3",
+      "label": "Benefit 3",
+      "default": "Verified customer reviews"
+    },
+    {
+      "type": "text",
+      "id": "benefit_4",
+      "label": "Benefit 4",
+      "default": "Direct support whenever you need help"
+    },
+    {
+      "type": "text",
+      "id": "benefit_5",
+      "label": "Benefit 5",
+      "default": "Simple returns and clear order history"
+    },
+    {
+      "type": "text",
+      "id": "benefit_6",
+      "label": "Benefit 6",
+      "default": "Personalized offers for signed-in customers"
+    },
+    {
+      "type": "textarea",
+      "id": "benefits_footer",
+      "label": "Benefits footer",
+      "default": "By signing in, you can track orders and manage your account faster."
     },
     {
       "type": "header",

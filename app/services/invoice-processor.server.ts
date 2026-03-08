@@ -1601,8 +1601,8 @@ function buildEmailMessage(params: {
     '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#efefef;padding:18px 8px;">',
     '<tr><td align="center">',
     '<table role="presentation" width="620" cellpadding="0" cellspacing="0" style="width:620px;max-width:620px;background:#ffffff;border:1px solid #dddddd;border-collapse:collapse;">',
-    '<tr><td style="height:4px;background:#2f8f2f;"></td></tr>',
-    '<tr><td style="padding:18px 24px 4px;font-family:Arial,sans-serif;font-size:24px;line-height:28px;font-weight:700;color:#2f8f2f;">' +
+    '<tr><td style="height:4px;background:#113534;"></td></tr>',
+    '<tr><td style="padding:18px 24px 4px;font-family:Arial,sans-serif;font-size:24px;line-height:28px;font-weight:700;color:#113534;">' +
       safeBrandText +
       "</td></tr>",
     logoUrl
@@ -1633,7 +1633,7 @@ function buildEmailMessage(params: {
       escapeHtml(invoiceNo) +
       "</strong></td></tr>",
     invoiceUrl
-      ? '<tr><td style="padding:8px 24px 10px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="background:#2f8f2f;border-radius:4px;"><a href="' +
+      ? '<tr><td style="padding:8px 24px 10px;"><table role="presentation" width="100%" cellpadding="0" cellspacing="0"><tr><td align="center" style="background:#113534;border-radius:4px;"><a href="' +
         safeInvoiceUrl +
         '" target="_blank" style="display:block;padding:12px 14px;font-family:Arial,sans-serif;font-size:16px;line-height:20px;font-weight:700;color:#ffffff;text-decoration:none;">' +
         safeOpenLabel +

@@ -34,6 +34,11 @@ class CartDrawer extends DrawerComponent {
   show(focusElement = null, animate = true) {
     super.show(focusElement, animate);
 
+    // Always start drawer content from the top on open.
+    this.querySelectorAll('.drawer__body.v-scrollable').forEach((node) => {
+      node.scrollTop = 0;
+    });
+
     if (this.open && !Shopify.designMode) {
       FoxTheme.a11y.trapFocus(this, this.focusElement);
     }
@@ -1154,7 +1159,7 @@ const renderPricing = (pricing) => {
   `;
   bEls.forEach((el) => (el.innerHTML = breakdownHtml));
 
-  // Applied campaigns + FREE LINES info (если есть)
+  // Applied campaigns + FREE LINES info (if present)
   const freeLines = Array.isArray(pricing.lines)
     ? pricing.lines.filter((l) => Number(l.finalUnitPrice || 0) === 0 && Number(l.quantity || 0) > 0)
     : [];
@@ -1211,7 +1216,7 @@ if (!elsBreakdown().length && !elsCampaigns().length) return;
       const cart = await (await fetch("/cart.js", { cache: "no-store" })).json();
       const payload = buildPayloadFromCart(cart);
 
-      // Debug – можно убрать потом
+      // Debug: can be removed later
       console.log("[pricing-preview] payload ->", payload);
 
       const res = await fetch(ENDPOINT, {

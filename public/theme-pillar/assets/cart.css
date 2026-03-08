@@ -282,3 +282,272 @@
 .free-shipping-goal--done .free-shipping-goal__label--default {
   display: none;
 }
+
+/* Cart redesign (iHerb-inspired) */
+.cart--iherb {
+  background: #f6f7f8;
+}
+
+.cart--iherb .cart__header {
+  margin-block-end: 2.2rem;
+}
+
+.cart--iherb .cart__header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.cart--iherb .cart__title {
+  margin: 0;
+}
+
+.cart--iherb .cart__ship-pill {
+  border: 1px solid #cfd6dc;
+  border-radius: 999px;
+  background: #fff;
+  color: #1f2937;
+  font-size: 1.4rem;
+  line-height: 1.2;
+  padding: 0.8rem 1.2rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.cart--iherb .cart__inner {
+  padding-inline-end: 0;
+}
+
+.cart--iherb tbody tr {
+  border-block-start-color: #e2e8ee;
+}
+
+.cart--iherb tbody tr td {
+  padding-block: 1.4rem;
+  padding-inline-end: 1.2rem;
+}
+
+.cart--iherb tbody tr td:first-child {
+  padding-inline-end: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .cart--iherb main-cart {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 50rem;
+    gap: 2.4rem;
+    align-items: start;
+  }
+
+  /* Keep only the right-side price block on desktop cart layout. */
+  .cart--iherb .cart-item__product--info > .template-content .cart-item__action .cart-item__prices {
+    display: none !important;
+  }
+}
+
+.cart--iherb .cart__footer {
+  background: #fff;
+  border: 1px solid #d9dee3;
+  border-radius: 1.8rem;
+}
+
+.cart--iherb .cart__footer-wrapper {
+  gap: 1.4rem;
+}
+
+.cart--iherb .cart__footer--subtotal {
+  border: 1px solid #d9dee3;
+  border-radius: 1.6rem;
+  padding: 1.4rem;
+  background: #fff;
+}
+
+.cart--iherb .cart__footer .cart__addon {
+  border: 1px solid #d9dee3;
+  border-radius: 1.6rem;
+  background: #fff;
+}
+
+.cart--iherb .cart__footer .totals {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin-top: 0.2rem;
+}
+
+.cart--iherb .cart__footer .tax-note {
+  color: #5c6672;
+}
+
+.cart--iherb .cart__footer .discount {
+  color: #c62828;
+}
+
+.cart--iherb .cart__footer .btn--primary {
+  background: #4b8f00;
+  border-color: #4b8f00;
+  color: #fff;
+  border-radius: 1rem;
+}
+
+.cart--iherb .free-shipping-goal {
+  background: #f2f5f6;
+  border: 1px solid #e0e4e8;
+  border-radius: 1.4rem;
+  padding: 1.2rem 1.4rem;
+  color: #20262d;
+  margin-block-end: 1.4rem;
+}
+
+.cart--iherb .free-shipping-goal .progress-bar {
+  --progress-bar-size: 0.8rem;
+  background: #d9dee3;
+  color: #4b8f00;
+}
+
+.cart--iherb .cart-item__title {
+  font-size: 1.8rem;
+  line-height: 1.35;
+  color: #151a1f;
+}
+
+.cart--iherb .cart-item__product .btn-remove {
+  color: #5f6975;
+}
+
+.cart--iherb .cart-quantity {
+  --buttons-height: 3.6rem;
+  border-radius: 999px;
+}
+
+.cart--iherb .cart-item__prices .price {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+@media (max-width: 1023.98px) {
+  .cart--iherb .cart__ship-pill {
+    width: 100%;
+    white-space: normal;
+  }
+
+  .cart--iherb .cart__footer {
+    margin-top: 2rem;
+  }
+}
+
+/* Cart drawer redesign */
+.cart-drawer--iherb .drawer__inner {
+  background: #f6f7f8;
+}
+
+.cart-drawer--iherb .drawer__header-inner {
+  border-bottom: 1px solid #e1e6ea;
+  padding: 1.4rem 1.6rem;
+}
+
+.cart-drawer--iherb .cart-drawer__ship-pill {
+  border: 1px solid #cfd6dc;
+  border-radius: 999px;
+  background: #fff;
+  color: #1f2937;
+  font-size: 1.2rem;
+  line-height: 1.25;
+  font-weight: 600;
+  padding: 0.6rem 1rem;
+  max-width: 55%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cart-drawer--iherb .drawer__body {
+  --cart-padding-start: 1.4rem;
+  --cart-padding-x: 1.6rem;
+  --cart-padding-end: 1.8rem;
+  scroll-snap-type: none;
+}
+
+.cart-drawer--iherb [data-mk-cart-list] {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cart-drawer--iherb [data-mk-cart-list] > [data-mk-campaigns-start],
+.cart-drawer--iherb [data-mk-cart-list] > [data-mk-campaigns-end],
+.cart-drawer--iherb [data-mk-cart-list] > [data-mk-gifts-start],
+.cart-drawer--iherb [data-mk-cart-list] > [data-mk-gifts-end] {
+  display: none !important;
+}
+
+.cart-drawer--iherb .free-shipping-goal {
+  background: #f2f5f6;
+  border: 1px solid #e0e4e8;
+  border-radius: 1.2rem;
+  padding: 1rem 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.cart-drawer--iherb .free-shipping-goal .progress-bar {
+  --progress-bar-size: 0.7rem;
+  background: #d9dee3;
+  color: #4b8f00;
+}
+
+.cart-drawer--iherb .cart-item {
+  background: #fff;
+  border: 1px solid #d9dee3;
+  border-radius: 1.4rem;
+  padding: 1rem;
+}
+
+.cart-drawer--iherb .cart-item__title {
+  font-size: 1.5rem;
+  line-height: 1.35;
+}
+
+.cart-drawer--iherb .cart-drawer__campaigns,
+.cart-drawer--iherb .cart-drawer__pricing-breakdown {
+  background: #fff;
+  border: 1px solid #d9dee3;
+  border-radius: 1.2rem;
+  padding: 1rem;
+}
+
+.cart-drawer--iherb .cart-drawer__footer {
+  border-top: 1px solid #dbe1e6;
+  background: #fff;
+  box-shadow: 0 -6px 14px rgba(15, 23, 42, 0.08);
+}
+
+.cart-drawer--iherb .drawer__footer-head,
+.cart-drawer--iherb .drawer__footer-body {
+  background: #fff;
+  border: 1px solid #d9dee3;
+  border-radius: 1.4rem;
+  padding: 1.2rem;
+}
+
+.cart-drawer--iherb .drawer__footer .totals {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.cart-drawer--iherb .drawer__footer .btn--primary {
+  background: #4b8f00;
+  border-color: #4b8f00;
+  color: #fff;
+  border-radius: 1rem;
+}
+
+.cart-drawer--iherb:hover .drawer__footer:hover .btn--primary:hover {
+  color: #4b8f00;
+}
+
+@media (max-width: 639.98px) {
+  .cart-drawer--iherb .cart-drawer__ship-pill {
+    display: none;
+  }
+}

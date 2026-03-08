@@ -136,7 +136,7 @@ function parsePhoneCodes(form: FormData) {
     const phoneCode = String(form.get(`country_${i}_phone_code`) ?? "").trim();
     if (!phoneCode) continue;
 
-    // "+372" или "372" -> "+372"
+    // "+372" or "372" -> "+372"
     const normalized = phoneCode.startsWith("+") ? phoneCode : `+${phoneCode}`;
     codes[code.toUpperCase()] = normalized;
   }

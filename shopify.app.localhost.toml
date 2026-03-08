@@ -1,7 +1,7 @@
 name = "Delivery app"
-# остальное можешь оставить как в основном, но главное:
-# 1) убрать webhook subscriptions
-# 2) убрать app_proxy
+# keep the rest aligned with the main config, but importantly:
+# 1) remove webhook subscriptions
+# 2) remove app_proxy
 
 [access_scopes]
 scopes = "write_products,read_metaobjects,write_metaobjects,read_metaobject_definitions,write_metaobject_definitions"

@@ -68,15 +68,15 @@ export async function createDraftOrder(admin: any, input: CreateDraftOrderInput)
   ];
 
   // IMPORTANT:
-  // Для variant line items Shopify поддерживает DraftOrderLineItemInput.priceOverride (MoneyInput),
-  // чтобы задать цену вместо каталожной. :contentReference[oaicite:2]{index=2}
+  // For variant line items Shopify supports DraftOrderLineItemInput.priceOverride (MoneyInput),
+  // allowing a custom price instead of catalog price. :contentReference[oaicite:2]{index=2}
   const lineItems = input.lines.map((l) => ({
     variantId: l.variantId,
     quantity: l.quantity,
     priceOverride: toMoney(l.finalUnitPrice, input.currencyCode),
   }));
 
-  // Shipping: в DraftOrderInput есть shippingLine (title + price).
+  // Shipping: DraftOrderInput supports shippingLine (title + price).
   const draftInput: any = {
     lineItems,
     metafields,

@@ -125,11 +125,12 @@ export async function getCustomerSavedProducts(shop: string, customerGidOrId: st
 
   let rows: SavedProductsRow[] = [];
   try {
-    rows = await db.$queryRawUnsafe<SavedProductsRow[]>(
-      `SELECT items_json FROM ${TABLE_NAME} WHERE shop = ? AND customer_id = ? LIMIT 1`,
-      shop,
-      customerId,
-    );
+    rows = await db.$queryRaw<SavedProductsRow[]>`
+      SELECT items_json
+      FROM customer_saved_products
+      WHERE shop = ${shop} AND customer_id = ${customerId}
+      LIMIT 1
+    `;
   } catch (error: any) {
     throw new SavedProductsError(
       "Failed to load saved products from database",
@@ -161,17 +162,12 @@ export async function setCustomerSavedProducts(
   await ensureTable();
 
   try {
-    await db.$executeRawUnsafe(
-      `
-      INSERT INTO ${TABLE_NAME} (shop, customer_id, items_json, updated_at)
-      VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+    await db.$executeRaw`
+      INSERT INTO customer_saved_products (shop, customer_id, items_json, updated_at)
+      VALUES (${shop}, ${customerId}, ${JSON.stringify(normalized)}, CURRENT_TIMESTAMP)
       ON CONFLICT(shop, customer_id)
       DO UPDATE SET items_json = excluded.items_json, updated_at = CURRENT_TIMESTAMP
-      `,
-      shop,
-      customerId,
-      JSON.stringify(normalized),
-    );
+    `;
   } catch (error: any) {
     throw new SavedProductsError(
       "Failed to save products to database",

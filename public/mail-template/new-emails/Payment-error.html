@@ -1,0 +1,405 @@
+{% capture email_title %} Your payment couldn’t be processed {% endcapture %}
+{% capture email_body %}
+  You added items to your shopping cart but the payment couldn’t be processed. You haven’t been charged.
+{% endcapture %}
+
+<!doctype html>
+<html lang="{{ locale | default: 'en' }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="x-apple-disable-message-reformatting">
+    <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+    <title>{{ email_title | default: 'Payment error' }}</title>
+
+    {{ content_for_header }}
+
+    <style>
+      html, body { margin: 0 !important; padding: 0 !important; width: 100% !important; }
+      * { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+      table, td { border-collapse: collapse !important; mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+      img { border: 0; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic; display: block; }
+      a { text-decoration: none; }
+
+      .preheader {
+        display: none !important;
+        visibility: hidden;
+        opacity: 0;
+        color: transparent;
+        height: 0;
+        width: 0;
+        overflow: hidden;
+        mso-hide: all;
+      }
+
+      .outer { background: #efefef; }
+      .container { width: 620px; max-width: 620px; }
+      .card { background: #ffffff; border: 1px solid #dddddd; }
+      .content { padding: 22px 24px; }
+      .top-line { height: 4px; background: #2f8f2f; }
+
+      .h1 { margin: 0; font-size: 34px; line-height: 38px; font-weight: 700; color: #131313; }
+      .h2 { margin: 0; font-size: 18px; line-height: 24px; font-weight: 700; color: #131313; }
+      .h3 { margin: 0; font-size: 15px; line-height: 20px; font-weight: 700; color: #131313; }
+      .text { margin: 0; font-size: 15px; line-height: 22px; color: #222222; }
+      .small { margin: 0; font-size: 13px; line-height: 19px; color: #555555; }
+      .hr { height: 1px; line-height: 1px; font-size: 0; background: #dcdcdc; }
+
+      .cta { background: #2f8f2f; border-radius: 4px; }
+      .cta a {
+        display: block;
+        padding: 13px 14px;
+        font-size: 18px;
+        line-height: 22px;
+        font-weight: 700;
+        color: #ffffff !important;
+        text-align: center;
+      }
+      .cta-secondary { background: #2f8f2f; border-radius: 4px; }
+      .cta-secondary a {
+        display: block;
+        padding: 12px 14px;
+        font-size: 16px;
+        line-height: 20px;
+        font-weight: 700;
+        color: #ffffff !important;
+        text-align: center;
+      }
+
+      .info-box {
+        border: 1px solid #d9e7d0;
+        background: #f3fbef;
+      }
+
+      .gift-card-box {
+        border: 1px solid #d6d6d6;
+        background: #fafafa;
+      }
+
+      .gift-code {
+        font-size: 20px;
+        line-height: 24px;
+        font-weight: 700;
+        letter-spacing: 1.2px;
+        color: #111111;
+      }
+
+      @media screen and (max-width: 680px) {
+        .container { width: 100% !important; max-width: 100% !important; }
+        .content { padding: 16px !important; }
+        .stack { display: block !important; width: 100% !important; }
+        .stack-spacer { display: none !important; }
+        .h1 { font-size: 30px !important; line-height: 34px !important; }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="preheader">{{ email_title | default: 'Payment error' }}</div>
+
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="outer">
+      <tr>
+        <td align="center" style="padding: 0 8px;">
+          <table role="presentation" width="620" cellpadding="0" cellspacing="0" class="container card">
+            <tr><td class="top-line"></td></tr>
+
+            <tr>
+              <td class="content" style="padding-bottom: 10px;">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td width="165" style="vertical-align: middle;">
+                      {% assign notification_logo_url = 'https://delivery.nanails.eu/images/nana-logo.png' %}
+                      {% if notification_logo_url != blank %}
+                        <img src="{{ notification_logo_url }}" alt="{{ shop.name }}" width="130" style="width: 130px; height: auto;">
+                      {% else %}
+                        <div style="font-family: Arial, sans-serif; font-size: 18px; line-height: 20px; color: #2f8f2f; font-weight: 700;">{{ shop.name }}</div>
+                      {% endif %}
+                    </td>
+                    <td style="vertical-align: middle; padding-left: 8px;">
+                      <p class="h1">{{ email_title | default: 'Payment error' }}</p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+
+            <tr>
+              <td class="content" style="padding-top: 0; padding-bottom: 8px;">
+                {% if email_body != blank %}
+                  <div class="text">{{ email_body }}</div>
+                {% elsif custom_message != blank %}
+                  <div class="text">{{ custom_message }}</div>
+                {% else %}
+                  <p class="text">This is an automated notification from {{ shop.name }}.</p>
+                {% endif %}
+
+                {% if email_emphasis != blank %}
+                  <p class="h2" style="margin-top: 12px;">{{ email_emphasis }}</p>
+                {% endif %}
+              </td>
+            </tr>
+
+            {% if issued_store_credit %}
+              <tr>
+                <td class="content" style="padding-top: 0; padding-bottom: 10px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="info-box">
+                    <tr>
+                      <td style="padding: 14px;">
+                        <p class="h2">Store credit issued</p>
+                        <p class="h1" style="margin-top: 6px; font-size: 40px; line-height: 44px; color:#2f8f2f;">
+                          {{ issued_store_credit.amount | money_with_currency }}
+                        </p>
+                        {% if issued_store_credit.expires_at %}
+                          <p class="small" style="margin-top: 8px;">Expires {{ issued_store_credit.expires_at | date: format: 'date_at_time_with_zone' }}</p>
+                        {% endif %}
+                        {% if issued_store_credit.balance_after_transaction %}
+                          <p class="small" style="margin-top: 8px;">Store credit balance: <strong>{{ issued_store_credit.balance_after_transaction | money_with_currency }}</strong></p>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            {% endif %}
+
+            {% if gift_card %}
+              {% assign gift_message = gift_card.message | default: gift_card.recipient.message %}
+              <tr>
+                <td class="content" style="padding-top: 0; padding-bottom: 10px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="gift-card-box">
+                    <tr>
+                      <td style="padding: 14px;">
+                        <p class="h2">Gift Card</p>
+                        <p class="h1" style="margin-top: 6px; font-size: 40px; line-height: 44px; color:#2f8f2f;">
+                          {{ gift_card.initial_value | money_with_currency }}
+                        </p>
+                        {% if gift_card.balance and gift_card.balance != gift_card.initial_value %}
+                          <p class="small" style="margin-top: 6px;">Current balance: <strong>{{ gift_card.balance | money_with_currency }}</strong></p>
+                        {% endif %}
+                        {% if gift_card.expires_on %}
+                          <p class="small" style="margin-top: 10px;">Expires on {{ gift_card.expires_on | date: '%B %d, %Y' }}</p>
+                        {% endif %}
+                        <table role="presentation" cellpadding="0" cellspacing="0" align="center" style="margin-top: 12px;">
+                          <tr>
+                            <td align="center">
+                              <img src="{{ 'gift-card/card.jpg' | shopify_asset_url }}" alt="Gift card image" width="240" height="160" style="width: 240px; max-width: 100%; height: auto; border: 1px solid #d8d8d8;">
+                            </td>
+                          </tr>
+                        </table>
+                        {% if gift_card.code %}
+                          <p class="small" style="margin-top: 12px;">Gift card code</p>
+                          <p class="gift-code" style="margin: 4px 0 0;">{{ gift_card.code | format_code }}</p>
+                        {% endif %}
+                        {% if gift_message != blank %}
+                          <p class="small" style="margin-top: 10px;">Message: {{ gift_message }}</p>
+                        {% endif %}
+                        {% if gift_card.url != blank %}
+                          <p class="small" style="margin-top: 10px;"><a href="{{ gift_card.url }}" style="color:#2f8f2f; font-weight:700;">View gift card balance</a></p>
+                        {% endif %}
+                        {% if gift_card.pass_url %}
+                          <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top: 12px;">
+                            <tr>
+                              <td>
+                                <a href="{{ gift_card.pass_url }}">
+                                  <img src="{{ 'gift-card/add-to-apple-wallet.png' | shopify_asset_url }}" alt="Add to Apple Wallet" width="120" height="40" style="width: 120px; height: 40px;">
+                                </a>
+                              </td>
+                            </tr>
+                          </table>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            {% endif %}
+
+            {% assign has_order = false %}
+            {% if order and order.name %}
+              {% assign has_order = true %}
+            {% endif %}
+
+            {% if has_order %}
+              <tr>
+                <td class="content" style="padding-top: 0; padding-bottom: 10px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #dcdcdc;">
+                    <tr>
+                      <td style="padding: 12px 14px;">
+                        <p class="h2">Order #{{ order.name }}</p>
+                        {% if order.created_at %}
+                          <p class="small" style="margin-top: 4px;">{{ order.created_at | date: '%b %d, %Y' }}</p>
+                        {% endif %}
+                        {% if order.total_price %}
+                          <p class="small" style="margin-top: 4px;">Total: <strong>{{ order.total_price | money }}</strong></p>
+                        {% endif %}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              {% assign notification_items = order.line_items %}
+              {% if notification_items and notification_items.size > 0 %}
+                <tr>
+                  <td class="content" style="padding-top: 0; padding-bottom: 8px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      {% for line in notification_items limit: 6 %}
+                        <tr>
+                          <td style="padding: 10px 0; border-bottom: 1px solid #e2e2e2;">
+                            <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                              <tr>
+                                <td width="64" style="vertical-align: top;">
+                                  {% if line.image %}
+                                    <img src="{{ line.image | img_url: '140x140', scale: 2 }}" alt="{{ line.title }}" width="56" height="56" style="width:56px;height:56px;border:1px solid #d8d8d8;">
+                                  {% endif %}
+                                </td>
+                                <td style="vertical-align: top; padding-right: 8px;">
+                                  <p class="text" style="font-weight:600;">{{ line.title }}</p>
+                                  {% if line.quantity %}
+                                    <p class="small" style="margin-top: 3px;">Qty: {{ line.quantity }}</p>
+                                  {% endif %}
+                                </td>
+                                <td width="96" style="vertical-align: top; text-align:right; white-space:nowrap;">
+                                  {% if line.final_line_price %}
+                                    <p class="text" style="font-weight:700;">{{ line.final_line_price | money }}</p>
+                                  {% elsif line.price %}
+                                    <p class="text" style="font-weight:700;">{{ line.price | money }}</p>
+                                  {% endif %}
+                                </td>
+                              </tr>
+                            </table>
+                          </td>
+                        </tr>
+                      {% endfor %}
+                    </table>
+                  </td>
+                </tr>
+              {% endif %}
+            {% endif %}
+
+            {% if amount %}
+              {% capture amount_money %}{{ amount | money_with_currency }}{% endcapture %}
+              <tr>
+                <td class="content" style="padding-top: 0; padding-bottom: 8px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="info-box">
+                    <tr>
+                      <td style="padding: 12px 14px;">
+                        <p class="h3" style="color:#1f5f1f;">Amount</p>
+                        <p class="h2" style="margin-top: 4px; color:#1f5f1f;">
+                          {% if amount_money != blank %}{{ amount_money }}{% else %}{{ amount }}{% endif %}
+                        </p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            {% endif %}
+
+            {% if fulfillment %}
+              <tr>
+                <td class="content" style="padding-top: 0; padding-bottom: 8px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #dcdcdc;">
+                    <tr>
+                      <td style="padding: 12px 14px;">
+                        <p class="h3">Shipment update</p>
+                        {% if fulfillment.estimated_delivery_at %}
+                          <p class="small" style="margin-top: 6px;">Estimated delivery: <strong>{{ fulfillment.estimated_delivery_at | date: '%B %d, %Y' }}</strong></p>
+                        {% endif %}
+                        {% if fulfillment.tracking_company %}
+                          <p class="small" style="margin-top: 4px;">Carrier: {{ fulfillment.tracking_company }}</p>
+                        {% endif %}
+                        {% if fulfillment.tracking_numbers and fulfillment.tracking_numbers.size > 0 %}
+                          {% if fulfillment.tracking_numbers.size == 1 %}
+                            <p class="small" style="margin-top: 4px;">
+                              {% if fulfillment.tracking_url %}
+                                Tracking: <a href="{{ fulfillment.tracking_url }}" style="color:#2f8f2f; font-weight:700;">{{ fulfillment.tracking_numbers.first }}</a>
+                              {% else %}
+                                Tracking: {{ fulfillment.tracking_numbers.first }}
+                              {% endif %}
+                            </p>
+                          {% else %}
+                            <p class="small" style="margin-top: 4px;">Tracking numbers:</p>
+                            {% for tracking_number in fulfillment.tracking_numbers %}
+                              <p class="small" style="margin-top: 2px;">
+                                {% if fulfillment.tracking_urls[forloop.index0] %}
+                                  <a href="{{ fulfillment.tracking_urls[forloop.index0] }}" style="color:#2f8f2f; font-weight:700;">{{ tracking_number }}</a>
+                                {% else %}
+                                  {{ tracking_number }}
+                                {% endif %}
+                              </p>
+                            {% endfor %}
+                          {% endif %}
+                        {% endif %}
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            {% endif %}
+
+            {% assign primary_url = '' %}
+            {% assign primary_label = '' %}
+            {% assign primary_btn_class = 'cta' %}
+
+            {% if order_status_url != blank %}
+              {% assign primary_url = order_status_url %}
+              {% assign primary_label = 'Check order status' %}
+              {% assign primary_btn_class = 'cta-secondary' %}
+            {% elsif account_activation_url != blank %}
+              {% assign primary_url = account_activation_url %}
+              {% assign primary_label = 'Activate account' %}
+            {% elsif reset_password_url != blank %}
+              {% assign primary_url = reset_password_url %}
+              {% assign primary_label = 'Reset password' %}
+            {% elsif activate_url != blank %}
+              {% assign primary_url = activate_url %}
+              {% assign primary_label = 'Activate account' %}
+            {% elsif issued_store_credit %}
+              {% assign primary_url = routes.account_profile_url %}
+              {% assign primary_label = 'View store credit' %}
+            {% elsif shopify_store_credit and shopify_store_credit.claim_url != blank %}
+              {% assign primary_url = shopify_store_credit.claim_url %}
+              {% assign primary_label = 'Redeem store credit' %}
+            {% elsif gift_card and gift_card.url != blank %}
+              {% assign primary_url = gift_card.url %}
+              {% assign primary_label = 'View gift card' %}
+            {% elsif fulfillment and fulfillment.tracking_url %}
+              {% assign primary_url = fulfillment.tracking_url %}
+              {% assign primary_label = 'Track shipment' %}
+              {% assign primary_btn_class = 'cta-secondary' %}
+            {% elsif action_url != blank %}
+              {% assign primary_url = action_url %}
+              {% assign primary_label = action_text | default: 'Open details' %}
+            {% elsif shop.url != blank %}
+              {% assign primary_url = shop.url %}
+              {% assign primary_label = 'Visit store' %}
+            {% endif %}
+
+            {% if primary_url != blank %}
+              <tr>
+                <td class="content" style="padding-top: 4px; padding-bottom: 8px;">
+                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td class="{{ primary_btn_class }}"><a href="{{ primary_url }}">{{ primary_label }}</a></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            {% endif %}
+
+            <tr>
+              <td class="content" style="padding-top: 8px; padding-bottom: 10px;"><div class="hr"></div></td>
+            </tr>
+
+            <tr>
+              <td class="content" style="padding-top: 0; padding-bottom: 18px;">
+                <p class="small">Questions? Contact our support team at <a href="mailto:info@nanails.eu" style="color:#2f8f2f;">info@nanails.eu</a>.</p>
+                <p class="small" style="margin-top: 8px;">This email was sent by {{ shop.name }}.</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

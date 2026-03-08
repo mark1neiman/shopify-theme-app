@@ -4,7 +4,7 @@
     --section-padding-bottom: {{ section.settings.padding_bottom }}px;
   }
 
-  /* Отступы внутри правой панели (free shipping + total + checkout) */
+  /* Spacing inside the right panel (free shipping + total + checkout) */
   #shopify-section-{{ section.id }} .cart__footer {
     padding: 1.5rem;
     border-radius: 16px;
@@ -22,34 +22,47 @@
 {{ 'component-custom-card.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
 
+{%- liquid
+  assign ship_country_label = localization.country.name | default: localization.country.iso_code | default: 'your country'
+  assign ship_zip_label = ''
+  if customer and customer.default_address and customer.default_address.zip != blank
+    assign ship_zip_label = customer.default_address.zip
+  endif
+-%}
+
 {%- if linklists['gift-wrapping'].links != blank and linklists['gift-wrapping'].links.first.type == 'product_link' -%}
   <script src="{{ 'gift-wrapping.js' | asset_url }}" defer="defer"></script>
 {%- endif -%}
 
-<div class="cart section--padding{% if cart == empty %} is-empty{% endif %}">
+<div class="cart cart--iherb section--padding{% if cart == empty %} is-empty{% endif %}">
   <div class="section__container page-width page-width--{{ section.settings.container }}">
     <div class="cart__header">
-      <h1 class="cart__title h1">
-        <motion-element data-motion="fade-up" class="inline-flex gap-2">
-          {{- 'sections.cart.title' | t }}
-          <cart-count
-            class="cart-count cart-count--blank"
-            aria-label="{{ 'general.cart.cart_count' | t: count: cart.item_count | escape }}"
-            {% if cart == empty %}
-              hidden
-            {% endif %}
-            data-type="blank"
+      <div class="cart__header-row">
+        <h1 class="cart__title h1">
+          <motion-element data-motion="fade-up" class="inline-flex gap-2">
+            {{- 'sections.cart.title' | t }}
+            <cart-count
+              class="cart-count cart-count--blank"
+              aria-label="{{ 'general.cart.cart_count' | t: count: cart.item_count | escape }}"
+              {% if cart == empty %}
+                hidden
+              {% endif %}
+              data-type="blank"
+            >
+              (
+              {%- if cart.item_count < 100 -%}
+                {{- cart.item_count -}}
+              {%- else -%}
+                99+
+              {%- endif -%}
+              )</cart-count
+            ></motion-element
           >
-            (
-            {%- if cart.item_count < 100 -%}
-              {{- cart.item_count -}}
-            {%- else -%}
-              99+
-            {%- endif -%}
-            )</cart-count
-          ></motion-element
-        >
-      </h1>
+        </h1>
+        <div class="cart__ship-pill" aria-label="Shipping destination">
+          <span>Ship to {{ ship_country_label }}{% if ship_zip_label != blank %}, {{ ship_zip_label }}{% endif %}</span>
+        </div>
+      </div>
     </div>
     <div class="cart__empty text-center flex flex-col gap-10">
       <div class="grid gap-5 cart__empty-header">
@@ -115,6 +128,20 @@
         assign items_in_cart = cart.item_count | minus: gift_wraps_in_cart
       endif
     -%}
+
+    {%- if cart.item_count > 0 -%}
+      {%- liquid
+        for block in section.blocks
+          if block.type == 'free_shipping_goal'
+            if settings.free_shipping_minimum_amount != blank
+              assign minimum_amount = settings.free_shipping_minimum_amount | remove: ' '
+              render 'free-shipping-goal', minimum_amount: minimum_amount
+            endif
+          endif
+        endfor
+      -%}
+    {%- endif -%}
+
     <main-cart
       id="MainCart-{{ section.id }}"
       class="block md:flex items-stretch"
@@ -704,16 +731,6 @@
         <div class="sticky-element">
           <div class="foxkit-cart-countdown-hook"></div>
           <div class="foxkit-cart-goal-hook"></div>
-          {%- liquid
-            for block in section.blocks
-              if block.type == 'free_shipping_goal'
-                if settings.free_shipping_minimum_amount != blank
-                  assign minimum_amount = settings.free_shipping_minimum_amount | remove: ' '
-                  render 'free-shipping-goal', minimum_amount: minimum_amount
-                endif
-              endif
-            endfor
-          -%}
           <div class="cart__footer-wrapper grid gap-6">
             {%- render 'gift-wrapping',
               section_id: section.id,

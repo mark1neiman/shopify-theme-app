@@ -1,5 +1,171 @@
-/* Login/Register */
-.login .section__wrapper,
+/* Login */
+.login--split .section__wrapper {
+  width: 100%;
+  max-width: 98rem;
+  padding: 0 1.5rem;
+  margin: 0 auto;
+}
+
+.login--split .login-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(28rem, 36rem);
+  border: 1px solid rgba(var(--color-border), var(--color-border-alpha, 1));
+  background-color: rgb(var(--color-background));
+  overflow: hidden;
+}
+
+.login--split .login-card__form-column {
+  padding: 3.2rem 4rem;
+}
+
+.login--split .login-card__topbar {
+  margin-bottom: 1.2rem;
+}
+
+.login--split .login-card__title {
+  margin: 0;
+}
+
+.login--split .login-card__subtitle {
+  margin: 1.2rem 0 0;
+  max-width: 56ch;
+}
+
+.login--split .login-panel {
+  margin-top: 2.4rem;
+}
+
+.login--split .login-panel__intro {
+  margin: 0.8rem 0 0;
+}
+
+.login--split .login-form {
+  margin-top: 2rem;
+}
+
+.login--split .login-form button,
+.login--split .login-form .btn--secondary {
+  margin-top: 2rem;
+}
+
+.login--split .login-form button + a,
+.login--split .login-form .btn--secondary + a,
+.login--split .login-form button + button,
+.login--split .login-form .btn--secondary + button {
+  margin-top: 1.2rem;
+}
+
+.login--split .login-form__separator {
+  margin: 1.2rem 0 0;
+  text-align: center;
+}
+
+.login--split .mk-login__forgot {
+  margin-top: 1.8rem;
+  text-align: center;
+}
+
+.login--split .btn--primary {
+  border-color: #4c9309;
+  background-color: #4c9309;
+}
+
+.login--split .btn--primary:hover {
+  border-color: #3e7b07;
+  background-color: #3e7b07;
+}
+
+.login--split .login-guest {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(var(--color-border), var(--color-border-alpha, 1));
+}
+
+.login--split .login-guest p {
+  margin: 0;
+}
+
+.login--split .login-card__benefits {
+  padding: 3.2rem;
+  border-left: 1px solid rgba(var(--color-border), var(--color-border-alpha, 1));
+  background-color: rgb(var(--color-secondary-background));
+}
+
+.login-benefits {
+  margin-top: 2rem;
+}
+
+.login-benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.login-benefits li + li {
+  margin-top: 1.2rem;
+}
+
+.login-benefits__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 1.9rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-top: 0.2rem;
+  border: 1px solid #4c9309;
+  border-radius: 50%;
+  color: #4c9309;
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.login--split .login-card__benefits-footer {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(var(--color-border), var(--color-border-alpha, 1));
+}
+
+.login--split #customer_login_guest button {
+  margin-top: 1.2rem;
+}
+
+.login--split #recover {
+  display: none;
+}
+
+.login--split #recover:target {
+  display: block;
+}
+
+.login--split #recover:target + #login {
+  display: none;
+}
+
+.login--split #recover,
+.login--split #login {
+  scroll-margin-top: 12rem;
+}
+
+@media (max-width: 1023.98px) {
+  .login--split .login-card {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .login--split .login-card__benefits {
+    border-top: 1px solid rgba(var(--color-border), var(--color-border-alpha, 1));
+    border-left: 0;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .login--split .login-card__form-column,
+  .login--split .login-card__benefits {
+    padding: 2.4rem;
+  }
+}
+
+/* Register/Activate/Reset password */
 .register .section__wrapper,
 .activate .section__wrapper,
 .reset-password .section__wrapper {
@@ -8,26 +174,25 @@
   padding: 0 1.5rem;
   margin: 0 auto;
 }
-.login p,
+
 .register p,
 .activate p,
 .reset-password p {
   margin: 1.2rem 0 0;
 }
-.login .form-field + a,
+
 .register .form-field + a,
 .activate .form-field + a,
 .reset-password .form-field + a {
   margin-top: 0.8rem;
 }
-.login form,
+
 .register form,
 .activate form,
 .reset-password form {
   margin: 2.4rem 0 0;
 }
-.login form button,
-.login form .btn--secondary,
+
 .register form button,
 .register form .btn--secondary,
 .activate form button,
@@ -36,8 +201,7 @@
 .reset-password form .btn--secondary {
   margin-top: 2.4rem;
 }
-.login form button + a,
-.login form .btn--secondary + a,
+
 .register form button + a,
 .register form .btn--secondary + a,
 .activate form button + a,
@@ -46,8 +210,7 @@
 .reset-password form .btn--secondary + a {
   margin-top: 1.6rem;
 }
-.login form button + button,
-.login form .btn--secondary + button,
+
 .register form button + button,
 .register form .btn--secondary + button,
 .activate form button + button,
@@ -56,50 +219,19 @@
 .reset-password form .btn--secondary + button {
   margin-top: 1.6rem;
 }
+
 @media (max-width: 767.98px) {
-  .login form,
   .register form,
   .activate form,
   .reset-password form {
     margin-top: 2rem;
   }
-  .login form button,
+
   .register form button,
   .activate form button,
   .reset-password form button {
     margin-top: 2rem;
   }
-}
-
-#customer_login_guest button {
-  margin-top: 0;
-}
-
-#recover,
-#recover + div {
-  display: none;
-}
-
-#recover:target {
-  display: block;
-}
-
-#recover:target + div {
-  display: block;
-}
-
-#recover:target ~ #login,
-#recover:target ~ #login + div {
-  display: none;
-}
-
-#recover,
-#login {
-  scroll-margin-top: 20rem;
-}
-
-#recover {
-  margin-bottom: 0;
 }
 
 .customer__header {

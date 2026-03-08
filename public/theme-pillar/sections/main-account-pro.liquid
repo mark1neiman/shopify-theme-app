@@ -1,16 +1,39 @@
 {{ 'account-pro.css' | asset_url | stylesheet_tag }}
+{{ 'customer.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'account-pro.js' | asset_url }}" defer></script>
+<script src="{{ 'customer.js' | asset_url }}" defer></script>
 
 {%- liquid
   assign avatar_seed = customer.first_name | default: customer.email | slice: 0, 1 | upcase
+  assign account_name = customer.first_name | default: customer.last_name
+  if account_name == blank
+    assign account_name = customer.email | split: '@' | first
+  endif
+  assign member_since = customer.created_at | date: '%B %d, %Y'
+  assign route_path = request.path | default: ''
+  assign active_order = order
+  assign is_addresses_page = false
+  assign is_order_page = false
+  if route_path contains '/account/addresses'
+    assign is_addresses_page = true
+  endif
+  if route_path contains '/account/orders/'
+    assign is_order_page = true
+  endif
+  assign default_tab = 'dashboard'
+  if is_addresses_page
+    assign default_tab = 'addresses'
+  elsif is_order_page and active_order
+    assign default_tab = 'order-detail'
+  endif
 
   assign total_spent_cents = 0
   assign open_orders_count = 0
   assign fulfilled_orders_count = 0
 
-  for order in customer.orders
-    assign total_spent_cents = total_spent_cents | plus: order.total_price
-    if order.fulfillment_status == 'fulfilled'
+  for customer_order in customer.orders
+    assign total_spent_cents = total_spent_cents | plus: customer_order.total_price
+    if customer_order.fulfillment_status == 'fulfilled'
       assign fulfilled_orders_count = fulfilled_orders_count | plus: 1
     else
       assign open_orders_count = open_orders_count | plus: 1
@@ -44,8 +67,8 @@
   assign recent_seen = ','
   assign recent_count = 0
   capture recent_product_cards
-    for order in customer.orders limit: 20
-      for line_item in order.line_items
+    for customer_order in customer.orders limit: 20
+      for line_item in customer_order.line_items
         assign product_id = line_item.product.id | default: line_item.product_id
         assign product_url = line_item.product.url | default: line_item.url
         if product_id and product_url != blank
@@ -66,7 +89,7 @@
               echo '<div class="mk-account__card-body">'
                 echo '<h3 class="mk-account__card-title"><a href="' | append: product_url | append: '">' | append: line_item.title | append: '</a></h3>'
                 echo '<p class="mk-account__card-meta">' | append: line_item.final_price | money | append: '</p>'
-                echo '<p class="mk-account__card-meta">From order ' | append: order.name | append: '</p>'
+                echo '<p class="mk-account__card-meta">From order ' | append: customer_order.name | append: '</p>'
               echo '</div>'
             echo '</article>'
           endunless
@@ -84,8 +107,8 @@
   assign special_seen = ','
   assign special_count = 0
   capture special_offer_cards
-    for order in customer.orders limit: 20
-      for line_item in order.line_items
+    for customer_order in customer.orders limit: 20
+      for line_item in customer_order.line_items
         assign p = line_item.product
         if p and p.url and p.compare_at_price_max > p.price
           assign marker = ',' | append: p.id | append: ','
@@ -126,52 +149,142 @@
   class="mk-account section section--padding"
   style="--section-padding-top: {{ section.settings.padding_top }}px; --section-padding-bottom: {{ section.settings.padding_bottom }}px;"
   data-mk-account-root="1"
+  data-account-default-tab="{{ default_tab }}"
 >
   <div class="page-width">
     <div class="mk-account__shell">
       <div class="mk-account__layout">
         <aside class="mk-account__sidebar">
-          <div class="mk-account__brand">
-            <div class="mk-account__avatar">{{ avatar_seed }}</div>
-            <div>
-              <p class="mk-account__brand-name">My Account</p>
-              <p class="mk-account__brand-email">{{ customer.email }}</p>
-            </div>
-          </div>
+          <h2 class="mk-account__sidebar-title">My Account</h2>
 
           <nav class="mk-account__menu" aria-label="Account sections">
-            <button type="button" class="mk-account__menu-btn is-active" data-account-tab-target="dashboard">Dashboard</button>
-            <button type="button" class="mk-account__menu-btn" data-account-tab-target="orders">Orders</button>
-            <button type="button" class="mk-account__menu-btn" data-account-tab-target="history">Watch history</button>
-            <button type="button" class="mk-account__menu-btn" data-account-tab-target="saved">Saved</button>
-            <button type="button" class="mk-account__menu-btn" data-account-tab-target="personal">Personal info</button>
-            <button type="button" class="mk-account__menu-btn" data-account-tab-target="offers">My gifts/promos</button>
-            <button type="button" class="mk-account__menu-btn" data-account-tab-target="special">Special offer</button>
+            <div class="mk-account__menu-group">
+              <p class="mk-account__menu-group-title">My Account</p>
+              <button type="button" class="mk-account__menu-btn is-active" data-account-tab-target="dashboard">Dashboard</button>
+              <button type="button" class="mk-account__menu-btn" data-account-tab-target="orders">Orders</button>
+              <button type="button" class="mk-account__menu-btn" data-account-tab-target="saved">My lists</button>
+              <button type="button" class="mk-account__menu-btn" data-account-tab-target="personal">Account information</button>
+              <button type="button" class="mk-account__menu-btn" data-account-tab-target="addresses">Address book</button>
+            </div>
+
+            <div class="mk-account__menu-group">
+              <p class="mk-account__menu-group-title">Credits & savings</p>
+              <button type="button" class="mk-account__menu-btn" data-account-tab-target="offers">Sales & offers</button>
+              <button type="button" class="mk-account__menu-btn" data-account-tab-target="special">Special offer</button>
+            </div>
+
+            <div class="mk-account__menu-group">
+              <p class="mk-account__menu-group-title">My Activity</p>
+              <button type="button" class="mk-account__menu-btn" data-account-tab-target="history">Watch history</button>
+              {% if active_order %}
+                <button type="button" class="mk-account__menu-btn" data-account-tab-target="order-detail">Order details</button>
+              {% endif %}
+            </div>
           </nav>
 
           <div class="mk-account__sidebar-actions">
-            <a href="{{ routes.account_addresses_url }}" class="btn btn--secondary">Manage addresses</a>
-            <a href="{{ routes.account_logout_url }}" class="btn btn--primary">Log out</a>
+            <a href="{{ routes.account_addresses_url }}#addresses" class="btn btn--secondary"><span class="btn__text">Manage addresses</span></a>
+            <a href="{{ routes.account_logout_url }}" class="btn btn--primary"><span class="btn__text">Log out</span></a>
           </div>
         </aside>
 
         <main class="mk-account__main">
-          <div class="mk-account__topbar">
-            <input
-              type="search"
-              class="mk-account__search"
-              placeholder="Search by order number, status, total"
-              data-account-search
-            >
-            <div class="mk-account__chips">
-              <span class="mk-account__chip">{{ customer.orders_count }} orders</span>
-              <span class="mk-account__chip">{{ customer.tags.size }} tags</span>
+          {% if is_order_page and active_order %}
+            <div class="mk-account__topbar mk-account__topbar--compact">
+              <div>
+                <p class="mk-account__kpi-label">Order details</p>
+                <p class="mk-account__title h4" style="margin: 0;">{{ active_order.name }}</p>
+              </div>
+              <div class="mk-account__chips">
+                <span class="mk-account__chip">{{ active_order.created_at | date: '%b %d, %Y' }}</span>
+                <a href="{{ routes.account_url }}#orders" class="btn btn--secondary btn--small"><span class="btn__text">Back to orders</span></a>
+              </div>
             </div>
-          </div>
+          {% elsif is_addresses_page %}
+            <div class="mk-account__topbar mk-account__topbar--compact">
+              <div>
+                <p class="mk-account__kpi-label">Address book</p>
+                <p class="mk-account__title h4" style="margin: 0;">Manage addresses</p>
+              </div>
+              <div class="mk-account__chips">
+                <span class="mk-account__chip">{{ customer.addresses.size }} saved</span>
+              </div>
+            </div>
+          {% else %}
+            <div class="mk-account__topbar">
+              <p class="mk-account__crumbs">
+                My Account <span aria-hidden="true">&rsaquo;</span> Dashboard
+              </p>
+              <div class="mk-account__chips">
+                <span class="mk-account__chip">{{ customer.orders_count }} orders</span>
+                <span class="mk-account__chip">{{ customer.tags.size }} tags</span>
+              </div>
+            </div>
+          {% endif %}
 
           <section class="mk-account__panel is-active" data-account-tab-panel="dashboard">
-            <h2 class="mk-account__title h4">Dashboard</h2>
-            <div class="mk-account__grid mk-account__grid--kpi">
+            <div class="mk-account__dashboard-hero">
+              <div class="mk-account__brand">
+                <div class="mk-account__avatar mk-account__avatar--hero">{{ avatar_seed }}</div>
+                <div>
+                  <p class="mk-account__brand-name">Hey, {{ account_name }}!</p>
+                  <p class="mk-account__brand-email">Customer since {{ member_since }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mk-account__feature-grid">
+              <article class="mk-account__feature-card">
+                <span class="mk-account__feature-icon" aria-hidden="true">01</span>
+                <div>
+                  <h3 class="mk-account__feature-title">Orders</h3>
+                  <p class="mk-account__muted">Track orders, request returns, and review your purchases.</p>
+                </div>
+                <a href="{{ routes.account_url }}#orders" data-account-tab-link="orders">Open</a>
+              </article>
+              <article class="mk-account__feature-card">
+                <span class="mk-account__feature-icon" aria-hidden="true">02</span>
+                <div>
+                  <h3 class="mk-account__feature-title">Address Book</h3>
+                  <p class="mk-account__muted">Manage shipping addresses in one place.</p>
+                </div>
+                <a href="{{ routes.account_url }}#addresses" data-account-tab-link="addresses">Open</a>
+              </article>
+              <article class="mk-account__feature-card">
+                <span class="mk-account__feature-icon" aria-hidden="true">03</span>
+                <div>
+                  <h3 class="mk-account__feature-title">Sales & offers</h3>
+                  <p class="mk-account__muted">See your personal promos and active discounts.</p>
+                </div>
+                <a href="{{ routes.account_url }}#offers" data-account-tab-link="offers">Open</a>
+              </article>
+              <article class="mk-account__feature-card">
+                <span class="mk-account__feature-icon" aria-hidden="true">04</span>
+                <div>
+                  <h3 class="mk-account__feature-title">My Lists</h3>
+                  <p class="mk-account__muted">Access products you saved for later.</p>
+                </div>
+                <a href="{{ routes.account_url }}#saved" data-account-tab-link="saved">Open</a>
+              </article>
+              <article class="mk-account__feature-card">
+                <span class="mk-account__feature-icon" aria-hidden="true">05</span>
+                <div>
+                  <h3 class="mk-account__feature-title">Watch history</h3>
+                  <p class="mk-account__muted">Find products viewed or purchased recently.</p>
+                </div>
+                <a href="{{ routes.account_url }}#history" data-account-tab-link="history">Open</a>
+              </article>
+              <article class="mk-account__feature-card">
+                <span class="mk-account__feature-icon" aria-hidden="true">06</span>
+                <div>
+                  <h3 class="mk-account__feature-title">Special offer</h3>
+                  <p class="mk-account__muted">Recommended discounted products from your history.</p>
+                </div>
+                <a href="{{ routes.account_url }}#special" data-account-tab-link="special">Open</a>
+              </article>
+            </div>
+
+            <div class="mk-account__grid mk-account__grid--kpi mk-account__grid--dashboard-kpi">
               <article class="mk-account__kpi">
                 <p class="mk-account__kpi-label">Total orders</p>
                 <p class="mk-account__kpi-value">{{ customer.orders_count }}</p>
@@ -185,10 +298,31 @@
                 <p class="mk-account__kpi-value">{{ total_spent_cents | money_without_trailing_zeros }}</p>
               </article>
             </div>
+
+            <div class="mk-account__recommendations">
+              <h2 class="mk-account__title h5">Recommended for you</h2>
+              {% if recent_count > 0 %}
+                <div class="mk-account__cards mk-account__cards--recommended">
+                  {{ recent_product_cards }}
+                </div>
+              {% else %}
+                <div class="mk-account__empty">
+                  No recommendations yet. Place an order to get personalized picks.
+                </div>
+              {% endif %}
+            </div>
           </section>
 
           <section class="mk-account__panel" data-account-tab-panel="orders">
-            <h2 class="mk-account__title h4">Orders</h2>
+            <div class="mk-account__panel-header">
+              <h2 class="mk-account__title h4">Orders</h2>
+              <input
+                type="search"
+                class="mk-account__search"
+                placeholder="Search by order number, status, total"
+                data-account-search
+              >
+            </div>
             <div class="mk-account__table-wrap">
               <table class="mk-account__table" role="table">
                 <thead>
@@ -197,29 +331,206 @@
                     <th>Date</th>
                     <th>Payment</th>
                     <th>Fulfillment</th>
+                    <th>Discount</th>
                     <th>Total</th>
                     <th>View</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {%- for order in customer.orders -%}
-                    <tr data-order-row="{{ order.name }} {{ order.financial_status_label }} {{ order.fulfillment_status_label }} {{ order.total_price | money }}">
-                      <td><a href="{{ order.customer_url }}">{{ order.name }}</a></td>
-                      <td>{{ order.created_at | time_tag: format: 'date' }}</td>
-                      <td>{{ order.financial_status_label }}</td>
-                      <td>{{ order.fulfillment_status_label }}</td>
-                      <td>{{ order.total_net_amount | money_with_currency }}</td>
+                  {%- for customer_order in customer.orders -%}
+                    <tr data-order-row="{{ customer_order.name }} {{ customer_order.financial_status_label }} {{ customer_order.fulfillment_status_label }} {{ customer_order.total_price | money }}">
+                      <td><a href="{{ customer_order.customer_url }}">{{ customer_order.name }}</a></td>
+                      <td>{{ customer_order.created_at | time_tag: format: 'date' }}</td>
+                      <td>{{ customer_order.financial_status_label }}</td>
+                      <td>{{ customer_order.fulfillment_status_label }}</td>
                       <td>
-                        <a href="{{ order.customer_url }}" class="btn btn--secondary btn--small">View order</a>
+                        {% if customer_order.total_discounts > 0 %}
+                          <span class="mk-account__discount-pill">-{{ customer_order.total_discounts | money }}</span>
+                        {% else %}
+                          <span class="mk-account__muted">-</span>
+                        {% endif %}
+                      </td>
+                      <td>{{ customer_order.total_net_amount | money_with_currency }}</td>
+                      <td>
+                        <a href="{{ customer_order.customer_url }}" class="btn btn--secondary btn--small"><span class="btn__text">View order</span></a>
                       </td>
                     </tr>
                   {%- else -%}
                     <tr>
-                      <td colspan="6" class="mk-account__muted">No orders yet.</td>
+                      <td colspan="7" class="mk-account__muted">No orders yet.</td>
                     </tr>
                   {%- endfor -%}
                 </tbody>
               </table>
+            </div>
+          </section>
+
+          <section class="mk-account__panel" data-account-tab-panel="addresses" data-customer-addresses>
+            <div class="mk-account__panel-header">
+              <h2 class="mk-account__title h4">Addresses</h2>
+              <button type="button" class="btn btn--primary btn--small" data-toggle-target="MkAddAddress"><span class="btn__text">Add new</span></button>
+            </div>
+
+            <div id="MkAddAddress" class="mk-account__address-form hidden" data-address>
+              <h3 class="h6">Add new address</h3>
+              {%- form 'customer_address', customer.new_address -%}
+                <div class="mk-account__field-grid">
+                  <div class="mk-account__field">
+                    <label for="AddressFirstNameNew" class="mk-account__field-label">First name</label>
+                    <input id="AddressFirstNameNew" name="address[first_name]" type="text" value="{{ form.first_name }}" class="form-control">
+                  </div>
+                  <div class="mk-account__field">
+                    <label for="AddressLastNameNew" class="mk-account__field-label">Last name</label>
+                    <input id="AddressLastNameNew" name="address[last_name]" type="text" value="{{ form.last_name }}" class="form-control">
+                  </div>
+                </div>
+                <div class="mk-account__field-grid">
+                  <div class="mk-account__field">
+                    <label for="AddressAddress1New" class="mk-account__field-label">Address line 1</label>
+                    <input id="AddressAddress1New" name="address[address1]" type="text" value="{{ form.address1 }}" class="form-control">
+                  </div>
+                  <div class="mk-account__field">
+                    <label for="AddressAddress2New" class="mk-account__field-label">Address line 2</label>
+                    <input id="AddressAddress2New" name="address[address2]" type="text" value="{{ form.address2 }}" class="form-control">
+                  </div>
+                </div>
+                <div class="mk-account__field-grid">
+                  <div class="mk-account__field">
+                    <label for="AddressCityNew" class="mk-account__field-label">City</label>
+                    <input id="AddressCityNew" name="address[city]" type="text" value="{{ form.city }}" class="form-control">
+                  </div>
+                  <div class="mk-account__field">
+                    <label for="AddressZipNew" class="mk-account__field-label">ZIP / Postal code</label>
+                    <input id="AddressZipNew" name="address[zip]" type="text" value="{{ form.zip }}" class="form-control">
+                  </div>
+                </div>
+                <div class="mk-account__field-grid">
+                  <div class="mk-account__field">
+                    <label for="AddressCountryNew" class="mk-account__field-label">Country</label>
+                    <select id="AddressCountryNew" name="address[country]" data-default="{{ form.country }}" class="form-control">
+                      {{ all_country_option_tags }}
+                    </select>
+                  </div>
+                  <div id="AddressProvinceContainerNew" class="mk-account__field" style="display:none;">
+                    <label for="AddressProvinceNew" class="mk-account__field-label">Province / Region</label>
+                    <select id="AddressProvinceNew" name="address[province]" data-default="{{ form.province }}" class="form-control"></select>
+                  </div>
+                </div>
+                <div class="mk-account__field-grid">
+                  <div class="mk-account__field">
+                    <label for="AddressPhoneNew" class="mk-account__field-label">Phone</label>
+                    <input id="AddressPhoneNew" name="address[phone]" type="tel" value="{{ form.phone }}" class="form-control">
+                  </div>
+                  <label class="mk-account__field mk-account__checkbox-field">
+                    {{ form.set_as_default_checkbox }}
+                    <span class="mk-account__field-label">Set as default address</span>
+                  </label>
+                </div>
+                <div class="mk-account__chips">
+                  <button class="btn btn--primary btn--small" type="submit"><span class="btn__text">Save address</span></button>
+                  <button class="btn btn--secondary btn--small" type="reset" data-toggle-target="MkAddAddress"><span class="btn__text">Cancel</span></button>
+                </div>
+              {%- endform -%}
+            </div>
+
+            <div class="mk-account__address-list">
+              {%- for address in customer.addresses -%}
+                <article class="mk-account__address-card" data-address>
+                  <div class="mk-account__address-card-head">
+                    <p class="mk-account__field-label" style="margin: 0;">
+                      {% if address == customer.default_address %}Default address{% else %}Address {{ forloop.index }}{% endif %}
+                    </p>
+                    <div class="mk-account__chips">
+                      <button type="button" class="btn btn--secondary btn--small" data-toggle-target="EditAddress_{{ address.id }}"><span class="btn__text">Edit</span></button>
+                      <button
+                        type="button"
+                        class="btn btn--secondary btn--small"
+                        data-target="{{ address.url }}"
+                        data-confirm-message="{{ 'customer.addresses.delete_confirm' | t }}"
+                      >
+                        <span class="btn__text">Delete</span>
+                      </button>
+                    </div>
+                  </div>
+                  <div class="mk-account__muted">{{ address | format_address }}</div>
+
+                  <div id="EditAddress_{{ address.id }}" class="mk-account__address-form hidden">
+                    <h3 class="h6">Edit address</h3>
+                    {%- form 'customer_address', address -%}
+                      <div class="mk-account__field-grid">
+                        <div class="mk-account__field">
+                          <label for="AddressFirstName_{{ form.id }}" class="mk-account__field-label">First name</label>
+                          <input id="AddressFirstName_{{ form.id }}" name="address[first_name]" type="text" value="{{ form.first_name }}" class="form-control">
+                        </div>
+                        <div class="mk-account__field">
+                          <label for="AddressLastName_{{ form.id }}" class="mk-account__field-label">Last name</label>
+                          <input id="AddressLastName_{{ form.id }}" name="address[last_name]" type="text" value="{{ form.last_name }}" class="form-control">
+                        </div>
+                      </div>
+                      <div class="mk-account__field-grid">
+                        <div class="mk-account__field">
+                          <label for="AddressAddress1_{{ form.id }}" class="mk-account__field-label">Address line 1</label>
+                          <input id="AddressAddress1_{{ form.id }}" name="address[address1]" type="text" value="{{ form.address1 }}" class="form-control">
+                        </div>
+                        <div class="mk-account__field">
+                          <label for="AddressAddress2_{{ form.id }}" class="mk-account__field-label">Address line 2</label>
+                          <input id="AddressAddress2_{{ form.id }}" name="address[address2]" type="text" value="{{ form.address2 }}" class="form-control">
+                        </div>
+                      </div>
+                      <div class="mk-account__field-grid">
+                        <div class="mk-account__field">
+                          <label for="AddressCity_{{ form.id }}" class="mk-account__field-label">City</label>
+                          <input id="AddressCity_{{ form.id }}" name="address[city]" type="text" value="{{ form.city }}" class="form-control">
+                        </div>
+                        <div class="mk-account__field">
+                          <label for="AddressZip_{{ form.id }}" class="mk-account__field-label">ZIP / Postal code</label>
+                          <input id="AddressZip_{{ form.id }}" name="address[zip]" type="text" value="{{ form.zip }}" class="form-control">
+                        </div>
+                      </div>
+                      <div class="mk-account__field-grid">
+                        <div class="mk-account__field">
+                          <label for="AddressCountry_{{ form.id }}" class="mk-account__field-label">Country</label>
+                          <select
+                            id="AddressCountry_{{ form.id }}"
+                            name="address[country]"
+                            data-address-country-select
+                            data-default="{{ form.country }}"
+                            data-form-id="{{ form.id }}"
+                            class="form-control"
+                          >
+                            {{ all_country_option_tags }}
+                          </select>
+                        </div>
+                        <div id="AddressProvinceContainer_{{ form.id }}" class="mk-account__field" style="display:none;">
+                          <label for="AddressProvince_{{ form.id }}" class="mk-account__field-label">Province / Region</label>
+                          <select
+                            id="AddressProvince_{{ form.id }}"
+                            name="address[province]"
+                            data-default="{{ form.province }}"
+                            class="form-control"
+                          ></select>
+                        </div>
+                      </div>
+                      <div class="mk-account__field-grid">
+                        <div class="mk-account__field">
+                          <label for="AddressPhone_{{ form.id }}" class="mk-account__field-label">Phone</label>
+                          <input id="AddressPhone_{{ form.id }}" name="address[phone]" type="tel" value="{{ form.phone }}" class="form-control">
+                        </div>
+                        <label class="mk-account__field mk-account__checkbox-field">
+                          {{ form.set_as_default_checkbox }}
+                          <span class="mk-account__field-label">Set as default address</span>
+                        </label>
+                      </div>
+                      <div class="mk-account__chips">
+                        <button class="btn btn--primary btn--small" type="submit"><span class="btn__text">Update address</span></button>
+                        <button class="btn btn--secondary btn--small" type="button" data-toggle-target="EditAddress_{{ address.id }}"><span class="btn__text">Cancel</span></button>
+                      </div>
+                    {%- endform -%}
+                  </div>
+                </article>
+              {%- else -%}
+                <div class="mk-account__empty">No addresses yet. Add your first address.</div>
+              {%- endfor -%}
             </div>
           </section>
 
@@ -274,12 +585,12 @@
               </div>
             </div>
             <div class="mk-account__chips" style="margin-top:12px;">
-              <a href="{{ routes.account_addresses_url }}" class="btn btn--secondary">Edit addresses</a>
+              <a href="{{ routes.account_addresses_url }}#addresses" class="btn btn--secondary"><span class="btn__text">Edit addresses</span></a>
               <form method="post" action="/account/recover">
                 <input type="hidden" name="form_type" value="recover_customer_password">
                 <input type="hidden" name="utf8" value="✓">
                 <input type="hidden" name="email" value="{{ customer.email }}">
-                <button type="submit" class="btn btn--secondary">Send password reset email</button>
+                <button type="submit" class="btn btn--secondary"><span class="btn__text">Send password reset email</span></button>
               </form>
             </div>
           </section>
@@ -311,6 +622,279 @@
               {% endif %}
             </div>
           </section>
+
+          {% if active_order %}
+            <section class="mk-account__panel" data-account-tab-panel="order-detail">
+              {%- liquid
+                assign shipping_total = 0
+                for shipping_method in active_order.shipping_methods
+                  assign shipping_total = shipping_total | plus: shipping_method.price
+                endfor
+
+                assign delivery_title = ''
+                assign pickup_provider = ''
+                assign pickup_country = ''
+                assign pickup_name = ''
+                assign recipient_name = ''
+                assign recipient_phone = ''
+                assign recipient_email = ''
+                assign member_discount_applied = false
+                assign member_discount_percent = ''
+                assign member_discount_amount = ''
+                assign member_discount_currency = ''
+                assign campaign_labels = ''
+                assign promo_code = ''
+
+                for attribute in active_order.attributes
+                  if attribute.last == blank
+                    continue
+                  endif
+                  assign attr_key_raw = attribute.first | downcase
+                  assign attr_value_raw = attribute.last | strip
+
+                  if attr_key_raw == 'itella_member_discount_applied'
+                    assign attr_value_flag = attr_value_raw | downcase
+                    if attr_value_flag == 'true' or attr_value_flag == '1' or attr_value_flag == 'yes'
+                      assign member_discount_applied = true
+                    endif
+                  elsif attr_key_raw == 'itella_member_discount_percent' and attr_value_raw != blank
+                    assign member_discount_percent = attr_value_raw
+                    assign member_discount_applied = true
+                  elsif attr_key_raw == 'itella_member_discount_amount' and attr_value_raw != blank
+                    assign member_discount_amount = attr_value_raw
+                    assign member_discount_applied = true
+                  elsif attr_key_raw == 'itella_member_discount_currency' and attr_value_raw != blank
+                    assign member_discount_currency = attr_value_raw
+                  elsif attr_key_raw == 'itella_campaign_labels' and attr_value_raw != blank
+                    assign campaign_labels = attr_value_raw
+                  elsif attr_key_raw == 'itella_promo_code' and attr_value_raw != blank
+                    assign promo_code = attr_value_raw
+                  endif
+
+                  assign attribute_key = attribute.first | replace: '_', ' ' | replace: '-', ' ' | strip | downcase
+                  assign attribute_prefix = attribute_key | slice: 0, 7
+                  if attribute_prefix == 'itella '
+                    assign attribute_key = attribute_key | remove_first: 'itella '
+                  endif
+
+                  case attribute_key
+                    when 'delivery title'
+                      assign delivery_title = attribute.last
+                    when 'pickup provider'
+                      assign pickup_provider = attribute.last
+                    when 'pickup country'
+                      assign pickup_country = attribute.last
+                    when 'pickup name'
+                      assign pickup_name = attribute.last
+                    when 'recipient name'
+                      assign recipient_name = attribute.last
+                    when 'recipient phone'
+                      assign recipient_phone = attribute.last
+                    when 'recipient email'
+                      assign recipient_email = attribute.last
+                  endcase
+                endfor
+
+                if delivery_title == blank and active_order.shipping_methods.size > 0
+                  assign delivery_title = active_order.shipping_methods.first.title
+                endif
+                if member_discount_applied and member_discount_percent == blank
+                  assign member_discount_percent = '15'
+                endif
+
+                assign show_delivery_details = false
+                if delivery_title != blank or pickup_provider != blank or pickup_country != blank or pickup_name != blank or recipient_name != blank or recipient_phone != blank or recipient_email != blank
+                  assign show_delivery_details = true
+                endif
+
+                assign vat_invoice_url = ''
+                assign vat_invoice_download_url = ''
+                if active_order.metafields.custom.vat_invoice_url != blank
+                  assign vat_invoice_url = active_order.metafields.custom.vat_invoice_url.value | default: active_order.metafields.custom.vat_invoice_url
+                  if vat_invoice_url contains '?'
+                    assign vat_invoice_download_url = vat_invoice_url | append: '&download=1'
+                  else
+                    assign vat_invoice_download_url = vat_invoice_url | append: '?download=1'
+                  endif
+                endif
+              -%}
+              <h2 class="mk-account__title h4">Order {{ active_order.name }}</h2>
+              <div class="mk-account__grid mk-account__grid--kpi">
+                <article class="mk-account__kpi">
+                  <p class="mk-account__kpi-label">Date</p>
+                  <p class="mk-account__kpi-value">{{ active_order.created_at | date: '%b %d, %Y' }}</p>
+                </article>
+                <article class="mk-account__kpi">
+                  <p class="mk-account__kpi-label">Payment status</p>
+                  <p class="mk-account__kpi-value">{{ active_order.financial_status_label }}</p>
+                </article>
+                <article class="mk-account__kpi">
+                  <p class="mk-account__kpi-label">Fulfillment</p>
+                  <p class="mk-account__kpi-value">{{ active_order.fulfillment_status_label }}</p>
+                </article>
+              </div>
+
+              <div class="mk-account__table-wrap" style="margin-top: 16px;">
+                <table class="mk-account__table" role="table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>SKU</th>
+                      <th>Price</th>
+                      <th>Qty</th>
+                      <th>Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for line_item in active_order.line_items %}
+                      {%- liquid
+                        assign line_discount = 0
+                        if line_item.original_line_price > line_item.final_line_price
+                          assign line_discount = line_item.original_line_price | minus: line_item.final_line_price
+                        endif
+                      -%}
+                      <tr>
+                        <td>
+                          {% if line_item.url != blank %}
+                            <a href="{{ line_item.url }}">{{ line_item.title }}</a>
+                          {% else %}
+                            {{ line_item.title }}
+                          {% endif %}
+                          {% if line_discount > 0 %}
+                            <div class="mk-account__muted" style="font-size: 12px; margin-top: 4px;">
+                              Discount: <span class="mk-account__discount-inline">-{{ line_discount | money_with_currency }}</span>
+                            </div>
+                          {% endif %}
+                        </td>
+                        <td>{{ line_item.sku | default: '-' }}</td>
+                        <td>{{ line_item.final_price | money_with_currency }}</td>
+                        <td>{{ line_item.quantity }}</td>
+                        <td>{{ line_item.final_line_price | money_with_currency }}</td>
+                      </tr>
+                    {% endfor %}
+                    <tr>
+                      <td colspan="4"><strong>Subtotal</strong></td>
+                      <td>{{ active_order.line_items_subtotal_price | money_with_currency }}</td>
+                    </tr>
+                    {% if active_order.total_discounts > 0 %}
+                      <tr>
+                        <td colspan="4"><strong>Discount</strong></td>
+                        <td><span class="mk-account__discount-inline">-{{ active_order.total_discounts | money_with_currency }}</span></td>
+                      </tr>
+                    {% endif %}
+                    {% if shipping_total > 0 %}
+                      <tr>
+                        <td colspan="4"><strong>Shipping</strong></td>
+                        <td>{{ shipping_total | money_with_currency }}</td>
+                      </tr>
+                    {% endif %}
+                    {% for tax_line in active_order.tax_lines %}
+                      <tr>
+                        <td colspan="4"><strong>Tax ({{ tax_line.title }})</strong></td>
+                        <td>{{ tax_line.price | money_with_currency }}</td>
+                      </tr>
+                    {% endfor %}
+                    <tr>
+                      <td colspan="4"><strong>Total</strong></td>
+                      <td><strong>{{ active_order.total_price | money_with_currency }}</strong></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="mk-account__field-grid" style="margin-top: 16px;">
+                <article class="mk-account__field">
+                  <p class="mk-account__field-label">Billing address</p>
+                  <div class="mk-account__muted">{{ active_order.billing_address | format_address }}</div>
+                </article>
+                <article class="mk-account__field">
+                  <p class="mk-account__field-label">Shipping address</p>
+                  <div class="mk-account__muted">{{ active_order.shipping_address | format_address }}</div>
+                </article>
+              </div>
+
+              {% if active_order.total_discounts > 0 or member_discount_applied or campaign_labels != blank or promo_code != blank %}
+                <article class="mk-account__discount-card" style="margin-top: 12px;">
+                  <div class="mk-account__discount-card-head">
+                    <p class="mk-account__field-label" style="margin: 0;">You saved</p>
+                    <strong class="mk-account__discount-pill">
+                      {% if active_order.total_discounts > 0 %}
+                        -{{ active_order.total_discounts | money_with_currency }}
+                      {% elsif member_discount_amount != blank %}
+                        -{{ member_discount_amount }}{% if member_discount_currency != blank %} {{ member_discount_currency }}{% endif %}
+                      {% elsif member_discount_applied %}
+                        -{{ member_discount_percent }}%
+                      {% else %}
+                        Active
+                      {% endif %}
+                    </strong>
+                  </div>
+                  <div class="mk-account__muted" style="display: grid; gap: 4px;">
+                    {% if member_discount_applied %}
+                      <p style="margin: 0;">
+                        Member discount: <strong>{{ member_discount_percent }}%</strong>
+                        {% if member_discount_amount != blank %}
+                          ({{ member_discount_amount }}{% if member_discount_currency != blank %} {{ member_discount_currency }}{% endif %})
+                        {% endif %}
+                      </p>
+                    {% endif %}
+                    {% if campaign_labels != blank %}
+                      <p style="margin: 0;">Campaigns: <strong>{{ campaign_labels }}</strong></p>
+                    {% endif %}
+                    {% if promo_code != blank %}
+                      <p style="margin: 0;">Promo: <strong>{{ promo_code }}</strong></p>
+                    {% endif %}
+                    {% unless member_discount_applied or campaign_labels != blank or promo_code != blank %}
+                      <p style="margin: 0;">Extra discounts applied to this order.</p>
+                    {% endunless %}
+                  </div>
+                </article>
+              {% endif %}
+
+              {% if show_delivery_details %}
+                <article class="mk-account__field" style="margin-top: 12px;">
+                  <p class="mk-account__field-label">Delivery details</p>
+                  <ul role="list" class="list-unstyled mk-account__muted" style="margin: 0; display: grid; gap: 4px;">
+                    {% if delivery_title != blank %}
+                      <li><strong>Delivery:</strong> {{ delivery_title }}</li>
+                    {% endif %}
+                    {% if pickup_provider != blank %}
+                      <li><strong>Pickup provider:</strong> {{ pickup_provider }}</li>
+                    {% endif %}
+                    {% if pickup_country != blank %}
+                      <li><strong>Pickup country:</strong> {{ pickup_country }}</li>
+                    {% endif %}
+                    {% if pickup_name != blank %}
+                      <li><strong>Pickup name:</strong> {{ pickup_name }}</li>
+                    {% endif %}
+                    {% if recipient_name != blank %}
+                      <li><strong>Recipient name:</strong> {{ recipient_name }}</li>
+                    {% endif %}
+                    {% if recipient_phone != blank %}
+                      <li><strong>Recipient phone:</strong> {{ recipient_phone }}</li>
+                    {% endif %}
+                    {% if recipient_email != blank %}
+                      <li><strong>Recipient email:</strong> {{ recipient_email }}</li>
+                    {% endif %}
+                  </ul>
+                </article>
+              {% endif %}
+
+              {% if vat_invoice_url != blank %}
+                <article class="mk-account__field" style="margin-top: 12px;">
+                  <p class="mk-account__field-label">VAT invoice</p>
+                  <div class="mk-account__chips">
+                    <a href="{{ vat_invoice_url }}" target="_blank" rel="noopener" class="btn btn--secondary btn--small">
+                      <span class="btn__text">Open PDF</span>
+                    </a>
+                    <a href="{{ vat_invoice_download_url }}" target="_blank" rel="noopener" class="btn btn--primary btn--small">
+                      <span class="btn__text">Download PDF</span>
+                    </a>
+                  </div>
+                </article>
+              {% endif %}
+            </section>
+          {% endif %}
         </main>
       </div>
     </div>
@@ -333,7 +917,7 @@
       "step": 2,
       "unit": "px",
       "label": "Top padding",
-      "default": 64
+      "default": 24
     },
     {
       "type": "range",
@@ -343,7 +927,7 @@
       "step": 2,
       "unit": "px",
       "label": "Bottom padding",
-      "default": 64
+      "default": 28
     }
   ]
 }

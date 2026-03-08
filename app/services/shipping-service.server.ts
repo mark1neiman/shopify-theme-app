@@ -85,7 +85,7 @@ async function fetchVariantPrices(admin: any, variantIds: string[]): Promise<Pri
 
     return map;
   } catch (err: any) {
-    // Shopify SDK кидает GraphqlQueryError -> иначе prepare падал 500
+    // Shopify SDK throws GraphqlQueryError; otherwise prepare could fail with 500
     console.error("[pricing] fetchVariantPrices failed:", err?.message ?? err);
     return map;
   }
@@ -97,7 +97,7 @@ export async function pricingEngine(admin: any, input: Input): Promise<Pricing> 
 
   const prices = await fetchVariantPrices(admin, variantIds);
 
-  // currency: берем из первого найденного, иначе EUR
+  // Currency: take the first available one, fallback to EUR
   let currencyCode = "EUR";
   for (const v of prices.values()) {
     if (v?.currencyCode) {
@@ -106,7 +106,7 @@ export async function pricingEngine(admin: any, input: Input): Promise<Pricing> 
     }
   }
 
-  const isMember = !!input.customerId; // включай как тебе надо
+  const isMember = !!input.customerId; // enable according to your business rules
 
   const lines: PricingLine[] = [];
   let baseSubtotal = 0;
@@ -120,7 +120,7 @@ export async function pricingEngine(admin: any, input: Input): Promise<Pricing> 
     const p = prices.get(variantId);
     const baseUnitPrice = round2(p?.amount ?? 0);
 
-    // Member -15% (пример), только если customerId есть
+    // Member -15% (example), only when customerId exists
     const memberUnitPrice = isMember ? round2(baseUnitPrice * 0.85) : baseUnitPrice;
 
     const lineBase = round2(baseUnitPrice * quantity);

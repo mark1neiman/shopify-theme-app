@@ -13,6 +13,7 @@ import {
   BlockStack,
   Divider,
   Banner,
+  Modal,
 } from "@shopify/polaris";
 import * as React from "react";
 
@@ -38,10 +39,19 @@ export type CampaignBase = {
   stackable: boolean;
 };
 
+export type CampaignAppliesTo = "products" | "collections";
+
+export type CampaignScope = {
+  appliesTo: CampaignAppliesTo;
+  productIds: string[];
+  collectionIds: string[];
+};
+
 export type BuyXGetOneFreeCampaign = CampaignBase & {
   type: "BuyXGetOneFree";
   buyQuantity: number;
   eligibleVariantIds: string[];
+  eligibleScope?: CampaignScope;
 };
 
 export type BuyXGetZFreeCampaign = CampaignBase & {
@@ -49,6 +59,7 @@ export type BuyXGetZFreeCampaign = CampaignBase & {
   buyQuantity: number;
   triggerVariantIds: string[];
   freeVariantId: string;
+  triggerScope?: CampaignScope;
 };
 
 export type BuyXGetZChoiceCampaign = CampaignBase & {
@@ -56,6 +67,8 @@ export type BuyXGetZChoiceCampaign = CampaignBase & {
   buyQuantity: number;
   triggerVariantIds: string[];
   choiceVariantIds: string[];
+  triggerScope?: CampaignScope;
+  choiceScope?: CampaignScope;
 };
 
 export type CartThresholdDiscountCampaign = CampaignBase & {
@@ -73,6 +86,7 @@ export type CartThresholdFreeChoiceCampaign = CampaignBase & {
   giftQuantity: number;
   repeatPerThreshold: boolean;
   choiceVariantIds: string[];
+  choiceScope?: CampaignScope;
 };
 
 export type Campaign =
@@ -117,12 +131,26 @@ function toGidVariant(raw: string): string {
   return `gid://shopify/ProductVariant/${s.replace(/[^\d]/g, "")}`;
 }
 
-function uniq(ids: string[]): string[] {
-  return Array.from(new Set(ids.filter(Boolean)));
+function toGidProduct(raw: string): string {
+  const s = String(raw || "").trim();
+  if (!s) return "";
+  if (s.startsWith("gid://")) return s;
+  const numeric = s.replace(/[^\d]/g, "");
+  if (!numeric) return "";
+  return `gid://shopify/Product/${numeric}`;
 }
 
-function variantIdsToText(ids: string[]): string {
-  return (ids || []).join("\n");
+function toGidCollection(raw: string): string {
+  const s = String(raw || "").trim();
+  if (!s) return "";
+  if (s.startsWith("gid://")) return s;
+  const numeric = s.replace(/[^\d]/g, "");
+  if (!numeric) return "";
+  return `gid://shopify/Collection/${numeric}`;
+}
+
+function uniq(ids: string[]): string[] {
+  return Array.from(new Set(ids.filter(Boolean)));
 }
 
 function toNumber(value: unknown, fallback = 0): number {
@@ -138,6 +166,35 @@ function ensureId(id: string): string {
 
 function clone<T>(v: T): T {
   return JSON.parse(JSON.stringify(v)) as T;
+}
+
+function asStringArray(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value.map((item) => String(item || "").trim()).filter(Boolean);
+}
+
+function defaultCampaignScope(): CampaignScope {
+  return {
+    appliesTo: "products",
+    productIds: [],
+    collectionIds: [],
+  };
+}
+
+function normalizeCampaignScope(value: unknown): CampaignScope {
+  const raw = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const appliesTo = raw.appliesTo === "collections" ? "collections" : "products";
+  const productIds = uniq(asStringArray(raw.productIds).map(toGidProduct));
+  const collectionIds = uniq(asStringArray(raw.collectionIds).map(toGidCollection));
+  return {
+    appliesTo,
+    productIds,
+    collectionIds,
+  };
+}
+
+function selectedScopeIds(scope: CampaignScope): string[] {
+  return scope.appliesTo === "collections" ? scope.collectionIds : scope.productIds;
 }
 
 /* =============================================================================
@@ -348,6 +405,452 @@ function VariantPicker({
   );
 }
 
+type CatalogOption = {
+  id: string;
+  title: string;
+  subtitle: string;
+  imageUrl: string;
+};
+
+type CampaignScopePickerProps = {
+  label: string;
+  value?: CampaignScope;
+  onChange: (nextScope: CampaignScope, nextVariantIds: string[]) => void;
+  resolvedVariantCount: number;
+  helpText?: string;
+};
+
+function CampaignScopePicker({ label, value, onChange, resolvedVariantCount, helpText }: CampaignScopePickerProps) {
+  const scope = React.useMemo(() => normalizeCampaignScope(value), [value]);
+  const selectedIds = React.useMemo(() => selectedScopeIds(scope), [scope]);
+  const [searchQuery, setSearchQuery] = React.useState("");
+  const [results, setResults] = React.useState<CatalogOption[]>([]);
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [isResolving, setIsResolving] = React.useState(false);
+  const [resolveError, setResolveError] = React.useState("");
+  const [selectedItemsById, setSelectedItemsById] = React.useState<Record<string, CatalogOption>>({});
+  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [modalQuery, setModalQuery] = React.useState("");
+  const [modalResults, setModalResults] = React.useState<CatalogOption[]>([]);
+  const [modalLoading, setModalLoading] = React.useState(false);
+  const [draftIds, setDraftIds] = React.useState<string[]>([]);
+  const searchDebounceRef = React.useRef<number | null>(null);
+
+  const resourceLabel = scope.appliesTo === "collections" ? "collections" : "products";
+
+  const fetchItems = React.useCallback(async (entity: CampaignAppliesTo, query: string, ids: string[]) => {
+    const params = new URLSearchParams();
+    params.set("entity", entity);
+    if (ids.length) params.set("ids", ids.join(","));
+    else params.set("q", query);
+    const res = await fetch(`/app/api/catalog?${params.toString()}`, { headers: { Accept: "application/json" } });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const items = Array.isArray(data?.items) ? data.items : [];
+    return items.map((item: any) => ({
+      id: String(item?.id || ""),
+      title: String(item?.title || item?.id || ""),
+      subtitle: String(item?.subtitle || ""),
+      imageUrl: String(item?.imageUrl || ""),
+    })) as CatalogOption[];
+  }, []);
+
+  const resolveVariantIds = React.useCallback(async (entity: CampaignAppliesTo, ids: string[]) => {
+    if (!ids.length) return [];
+    const params = new URLSearchParams();
+    params.set("entity", entity);
+    params.set("mode", "resolveVariants");
+    params.set("ids", ids.join(","));
+    const res = await fetch(`/app/api/catalog?${params.toString()}`, { headers: { Accept: "application/json" } });
+    if (!res.ok) return [];
+    const data = await res.json();
+    const variantIds = Array.isArray(data?.variantIds) ? data.variantIds : [];
+    return uniq(variantIds.map(toGidVariant));
+  }, []);
+
+  const applyScope = React.useCallback(
+    async (nextAppliesTo: CampaignAppliesTo, nextIdsRaw: string[]) => {
+      const normalizedIds = uniq(
+        nextIdsRaw.map(nextAppliesTo === "collections" ? toGidCollection : toGidProduct).filter(Boolean),
+      );
+      const nextScope: CampaignScope =
+        nextAppliesTo === "collections"
+          ? { ...scope, appliesTo: "collections", collectionIds: normalizedIds }
+          : { ...scope, appliesTo: "products", productIds: normalizedIds };
+
+      setResolveError("");
+      if (!normalizedIds.length) {
+        onChange(nextScope, []);
+        return;
+      }
+
+      setIsResolving(true);
+      try {
+        const variantIds = await resolveVariantIds(nextAppliesTo, normalizedIds);
+        onChange(nextScope, variantIds);
+      } catch {
+        onChange(nextScope, []);
+        setResolveError("Could not resolve variants from selected items.");
+      } finally {
+        setIsResolving(false);
+      }
+    },
+    [onChange, resolveVariantIds, scope],
+  );
+
+  const runInlineSearch = React.useCallback(
+    async (query: string) => {
+      const trimmed = query.trim();
+      if (!trimmed) {
+        setResults([]);
+        return;
+      }
+      setIsSearching(true);
+      try {
+        const items = await fetchItems(scope.appliesTo, trimmed, []);
+        setResults(items);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [fetchItems, scope.appliesTo],
+  );
+
+  const runModalSearch = React.useCallback(
+    async (query: string) => {
+      setModalLoading(true);
+      try {
+        const items = await fetchItems(scope.appliesTo, query.trim(), []);
+        setModalResults(items);
+      } finally {
+        setModalLoading(false);
+      }
+    },
+    [fetchItems, scope.appliesTo],
+  );
+
+  React.useEffect(() => {
+    if (searchDebounceRef.current) window.clearTimeout(searchDebounceRef.current);
+    searchDebounceRef.current = window.setTimeout(() => {
+      runInlineSearch(searchQuery);
+    }, 180);
+    return () => {
+      if (searchDebounceRef.current) window.clearTimeout(searchDebounceRef.current);
+    };
+  }, [searchQuery, runInlineSearch]);
+
+  React.useEffect(() => {
+    const missing = selectedIds.filter((id) => !selectedItemsById[id]);
+    if (!missing.length) return;
+    let cancelled = false;
+    (async () => {
+      const items = await fetchItems(scope.appliesTo, "", missing);
+      if (cancelled || !items.length) return;
+      setSelectedItemsById((prev) => {
+        const next = { ...prev };
+        items.forEach((item) => {
+          next[item.id] = item;
+        });
+        return next;
+      });
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchItems, scope.appliesTo, selectedIds, selectedItemsById]);
+
+  React.useEffect(() => {
+    setResults([]);
+    setSearchQuery("");
+    setResolveError("");
+  }, [scope.appliesTo]);
+
+  const inlineOptions = results.filter((item) => !selectedIds.includes(item.id));
+
+  return (
+    <BlockStack gap="300">
+      <Select
+        label="Applies to"
+        options={[
+          { label: "Specific products", value: "products" },
+          { label: "Specific collections", value: "collections" },
+        ]}
+        value={scope.appliesTo}
+        onChange={(next) => {
+          const nextAppliesTo = next === "collections" ? "collections" : "products";
+          const nextIds = nextAppliesTo === "collections" ? scope.collectionIds : scope.productIds;
+          void applyScope(nextAppliesTo, nextIds);
+        }}
+      />
+
+      <InlineStack gap="200" blockAlign="end">
+        <div style={{ flex: 1 }}>
+          <TextField
+            label={label}
+            labelHidden
+            value={searchQuery}
+            onChange={setSearchQuery}
+            autoComplete="off"
+            placeholder={`Search ${resourceLabel}`}
+            helpText={helpText}
+          />
+        </div>
+        <Button
+          onClick={() => {
+            setIsModalOpen(true);
+            setDraftIds([...selectedIds]);
+            setModalQuery("");
+            void runModalSearch("");
+          }}
+        >
+          Browse
+        </Button>
+      </InlineStack>
+
+      {isSearching ? (
+        <Text as="p" tone="subdued">
+          Searching...
+        </Text>
+      ) : null}
+
+      {inlineOptions.length > 0 ? (
+        <Card padding="200">
+          <BlockStack gap="150">
+            {inlineOptions.slice(0, 8).map((item) => (
+              <InlineStack key={item.id} align="space-between" blockAlign="center" gap="200">
+                <InlineStack gap="200" blockAlign="center">
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt=""
+                      width={40}
+                      height={40}
+                      style={{ width: 40, height: 40, borderRadius: 8, objectFit: "cover", border: "1px solid #e1e3e5" }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: 40,
+                        height: 40,
+                        borderRadius: 8,
+                        background: "#f6f6f7",
+                        border: "1px solid #e1e3e5",
+                      }}
+                    />
+                  )}
+                  <BlockStack gap="0">
+                    <Text as="span" variant="bodySm">
+                      {item.title}
+                    </Text>
+                    <Text as="span" tone="subdued" variant="bodySm">
+                      {item.subtitle}
+                    </Text>
+                  </BlockStack>
+                </InlineStack>
+                <Button
+                  size="slim"
+                  onClick={() => {
+                    const nextIds = uniq([...selectedIds, item.id]);
+                    void applyScope(scope.appliesTo, nextIds);
+                  }}
+                >
+                  Add
+                </Button>
+              </InlineStack>
+            ))}
+          </BlockStack>
+        </Card>
+      ) : null}
+
+      <Card padding="0">
+        <BlockStack gap="0">
+          {selectedIds.length === 0 ? (
+            <div style={{ padding: 12 }}>
+              <Text as="p" tone="subdued">
+                No selected {resourceLabel}.
+              </Text>
+            </div>
+          ) : (
+            selectedIds.map((id, index) => (
+              <div
+                key={id}
+                style={{
+                  padding: 12,
+                  borderTop: index > 0 ? "1px solid #e1e3e5" : undefined,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  gap: 12,
+                }}
+              >
+                <InlineStack gap="200" blockAlign="center">
+                  {selectedItemsById[id]?.imageUrl ? (
+                    <img
+                      src={selectedItemsById[id].imageUrl}
+                      alt=""
+                      width={44}
+                      height={44}
+                      style={{ width: 44, height: 44, borderRadius: 8, objectFit: "cover", border: "1px solid #e1e3e5" }}
+                    />
+                  ) : (
+                    <div
+                      style={{
+                        width: 44,
+                        height: 44,
+                        borderRadius: 8,
+                        background: "#f6f6f7",
+                        border: "1px solid #e1e3e5",
+                      }}
+                    />
+                  )}
+                  <BlockStack gap="0">
+                    <Text as="span" variant="bodySm">
+                      {selectedItemsById[id]?.title || id}
+                    </Text>
+                    <Text as="span" tone="subdued" variant="bodySm">
+                      {selectedItemsById[id]?.subtitle || id}
+                    </Text>
+                  </BlockStack>
+                </InlineStack>
+                <Button
+                  tone="critical"
+                  variant="tertiary"
+                  onClick={() => {
+                    const nextIds = selectedIds.filter((itemId) => itemId !== id);
+                    void applyScope(scope.appliesTo, nextIds);
+                  }}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))
+          )}
+        </BlockStack>
+      </Card>
+
+      <Text as="p" tone={resolveError ? "critical" : "subdued"} variant="bodySm">
+        {resolveError
+          ? resolveError
+          : isResolving
+            ? "Resolving variants..."
+            : `Resolved variants: ${resolvedVariantCount}`}
+      </Text>
+
+      <Modal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={`Select ${resourceLabel}`}
+        primaryAction={{
+          content: "Done",
+          loading: isResolving,
+          onAction: () => {
+            void (async () => {
+              await applyScope(scope.appliesTo, draftIds);
+              setIsModalOpen(false);
+            })();
+          },
+        }}
+        secondaryActions={[
+          {
+            content: "Cancel",
+            onAction: () => setIsModalOpen(false),
+          },
+        ]}
+      >
+        <Modal.Section>
+          <BlockStack gap="300">
+            <TextField
+              label={`Search ${resourceLabel}`}
+              value={modalQuery}
+              onChange={(value: string) => {
+                setModalQuery(value);
+                void runModalSearch(value);
+              }}
+              autoComplete="off"
+            />
+
+            {modalLoading ? (
+              <Text as="p" tone="subdued">
+                Loading...
+              </Text>
+            ) : modalResults.length === 0 ? (
+              <Text as="p" tone="subdued">
+                No results.
+              </Text>
+            ) : (
+              <Card padding="0">
+                <BlockStack gap="0">
+                  {modalResults.map((item, index) => {
+                    const checked = draftIds.includes(item.id);
+                    return (
+                      <div
+                        key={item.id}
+                        style={{
+                          padding: 12,
+                          borderTop: index > 0 ? "1px solid #e1e3e5" : undefined,
+                        }}
+                      >
+                        <InlineStack align="space-between" blockAlign="center" gap="200">
+                          <InlineStack gap="200" blockAlign="center">
+                            {item.imageUrl ? (
+                              <img
+                                src={item.imageUrl}
+                                alt=""
+                                width={40}
+                                height={40}
+                                style={{
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: 8,
+                                  objectFit: "cover",
+                                  border: "1px solid #e1e3e5",
+                                }}
+                              />
+                            ) : (
+                              <div
+                                style={{
+                                  width: 40,
+                                  height: 40,
+                                  borderRadius: 8,
+                                  background: "#f6f6f7",
+                                  border: "1px solid #e1e3e5",
+                                }}
+                              />
+                            )}
+                            <BlockStack gap="0">
+                              <Text as="span" variant="bodySm">
+                                {item.title}
+                              </Text>
+                              <Text as="span" tone="subdued" variant="bodySm">
+                                {item.subtitle}
+                              </Text>
+                            </BlockStack>
+                          </InlineStack>
+                          <Checkbox
+                            label=""
+                            labelHidden
+                            checked={checked}
+                            onChange={(nextChecked: boolean) => {
+                              setDraftIds((prev) => {
+                                if (nextChecked) return uniq([...prev, item.id]);
+                                return prev.filter((id) => id !== item.id);
+                              });
+                            }}
+                          />
+                        </InlineStack>
+                      </div>
+                    );
+                  })}
+                </BlockStack>
+              </Card>
+            )}
+          </BlockStack>
+        </Modal.Section>
+      </Modal>
+    </BlockStack>
+  );
+}
+
 /* =============================================================================
  * Loader / Action
  * ========================================================================== */
@@ -446,6 +949,7 @@ export async function action({ request }: ActionFunctionArgs) {
         type: "BuyXGetOneFree",
         buyQuantity: toNumber((c as any).buyQuantity, 4),
         eligibleVariantIds: uniq(((c as any).eligibleVariantIds ?? []).map(toGidVariant)),
+        eligibleScope: normalizeCampaignScope((c as any).eligibleScope),
       };
     }
 
@@ -456,6 +960,7 @@ export async function action({ request }: ActionFunctionArgs) {
         buyQuantity: toNumber((c as any).buyQuantity, 2),
         triggerVariantIds: uniq(((c as any).triggerVariantIds ?? []).map(toGidVariant)),
         freeVariantId: toGidVariant((c as any).freeVariantId ?? ""),
+        triggerScope: normalizeCampaignScope((c as any).triggerScope),
       };
     }
 
@@ -466,6 +971,8 @@ export async function action({ request }: ActionFunctionArgs) {
         buyQuantity: toNumber((c as any).buyQuantity, 3),
         triggerVariantIds: uniq(((c as any).triggerVariantIds ?? []).map(toGidVariant)),
         choiceVariantIds: uniq(((c as any).choiceVariantIds ?? []).map(toGidVariant)),
+        triggerScope: normalizeCampaignScope((c as any).triggerScope),
+        choiceScope: normalizeCampaignScope((c as any).choiceScope),
       };
     }
 
@@ -490,6 +997,7 @@ export async function action({ request }: ActionFunctionArgs) {
       giftQuantity: Math.max(1, toNumber((c as any).giftQuantity, 1)),
       repeatPerThreshold: Boolean((c as any).repeatPerThreshold),
       choiceVariantIds: uniq(((c as any).choiceVariantIds ?? []).map(toGidVariant)),
+      choiceScope: normalizeCampaignScope((c as any).choiceScope),
     };
   });
 
@@ -614,7 +1122,7 @@ export default function CampaignsPage() {
     let next: Campaign;
 
     if (selectedType === "BuyXGetOneFree") {
-      next = { ...base, type: "BuyXGetOneFree", buyQuantity: 4, eligibleVariantIds: [] };
+      next = { ...base, type: "BuyXGetOneFree", buyQuantity: 4, eligibleVariantIds: [], eligibleScope: defaultCampaignScope() };
     } else if (selectedType === "BuyXGetZFree") {
       next = {
         ...base,
@@ -622,6 +1130,7 @@ export default function CampaignsPage() {
         buyQuantity: 2,
         triggerVariantIds: [],
         freeVariantId: "",
+        triggerScope: defaultCampaignScope(),
       };
     } else if (selectedType === "BuyXGetZChoice") {
       next = {
@@ -630,6 +1139,8 @@ export default function CampaignsPage() {
         buyQuantity: 3,
         triggerVariantIds: [],
         choiceVariantIds: [],
+        triggerScope: defaultCampaignScope(),
+        choiceScope: defaultCampaignScope(),
       };
     } else if (selectedType === "CartThresholdDiscount") {
       next = {
@@ -646,6 +1157,7 @@ export default function CampaignsPage() {
         giftQuantity: 1,
         repeatPerThreshold: false,
         choiceVariantIds: [],
+        choiceScope: defaultCampaignScope(),
       };
     }
 
@@ -664,20 +1176,18 @@ export default function CampaignsPage() {
             autoComplete="off"
             helpText="Example: X=4 means in each 4 eligible items, 1 cheapest item is free."
           />
-
-          <TextField
-            label="Eligible variant IDs (auto-filled)"
-            value={variantIdsToText(c.eligibleVariantIds)}
-            onChange={() => undefined}
-            readOnly
-            autoComplete="off"
-            helpText="Pick variants below — list updates automatically."
-          />
-
-          <VariantPicker
-            label="Search eligible variants"
-            selectedIds={c.eligibleVariantIds}
-            onChange={(next) => updateCampaign(idx, { ...c, eligibleVariantIds: uniq(next.map(toGidVariant)) })}
+          <CampaignScopePicker
+            label="Search products"
+            value={c.eligibleScope}
+            resolvedVariantCount={c.eligibleVariantIds.length}
+            helpText="Use Browse to pick products or collections."
+            onChange={(nextScope, nextVariantIds) =>
+              updateCampaign(idx, {
+                ...c,
+                eligibleScope: nextScope,
+                eligibleVariantIds: nextVariantIds,
+              })
+            }
           />
         </BlockStack>
       );
@@ -693,19 +1203,18 @@ export default function CampaignsPage() {
             onChange={(value: string) => updateCampaign(idx, { ...c, buyQuantity: toNumber(value, 0) })}
             autoComplete="off"
           />
-
-          <TextField
-            label="Trigger variant IDs (auto-filled)"
-            value={variantIdsToText(c.triggerVariantIds)}
-            onChange={() => undefined}
-            readOnly
-            autoComplete="off"
-          />
-
-          <VariantPicker
-            label="Search trigger variants"
-            selectedIds={c.triggerVariantIds}
-            onChange={(next) => updateCampaign(idx, { ...c, triggerVariantIds: uniq(next.map(toGidVariant)) })}
+          <CampaignScopePicker
+            label="Search products"
+            value={c.triggerScope}
+            resolvedVariantCount={c.triggerVariantIds.length}
+            helpText="Define which products/collections trigger the campaign."
+            onChange={(nextScope, nextVariantIds) =>
+              updateCampaign(idx, {
+                ...c,
+                triggerScope: nextScope,
+                triggerVariantIds: nextVariantIds,
+              })
+            }
           />
 
           <TextField
@@ -736,33 +1245,31 @@ export default function CampaignsPage() {
             onChange={(value: string) => updateCampaign(idx, { ...c, buyQuantity: toNumber(value, 0) })}
             autoComplete="off"
           />
-
-          <TextField
-            label="Trigger variant IDs (auto-filled)"
-            value={variantIdsToText(c.triggerVariantIds)}
-            onChange={() => undefined}
-            readOnly
-            autoComplete="off"
+          <CampaignScopePicker
+            label="Search products"
+            value={c.triggerScope}
+            resolvedVariantCount={c.triggerVariantIds.length}
+            helpText="Define which items are required in cart."
+            onChange={(nextScope, nextVariantIds) =>
+              updateCampaign(idx, {
+                ...c,
+                triggerScope: nextScope,
+                triggerVariantIds: nextVariantIds,
+              })
+            }
           />
-
-          <VariantPicker
-            label="Search trigger variants"
-            selectedIds={c.triggerVariantIds}
-            onChange={(next) => updateCampaign(idx, { ...c, triggerVariantIds: uniq(next.map(toGidVariant)) })}
-          />
-
-          <TextField
-            label="Choice variant IDs (gifts) (auto-filled)"
-            value={variantIdsToText(c.choiceVariantIds)}
-            onChange={() => undefined}
-            readOnly
-            autoComplete="off"
-          />
-
-          <VariantPicker
-            label="Search gift variants"
-            selectedIds={c.choiceVariantIds}
-            onChange={(next) => updateCampaign(idx, { ...c, choiceVariantIds: uniq(next.map(toGidVariant)) })}
+          <CampaignScopePicker
+            label="Search gifts"
+            value={c.choiceScope}
+            resolvedVariantCount={c.choiceVariantIds.length}
+            helpText="Define allowed free gift pool."
+            onChange={(nextScope, nextVariantIds) =>
+              updateCampaign(idx, {
+                ...c,
+                choiceScope: nextScope,
+                choiceVariantIds: nextVariantIds,
+              })
+            }
           />
         </BlockStack>
       );
@@ -828,19 +1335,18 @@ export default function CampaignsPage() {
           onChange={(value: boolean) => updateCampaign(idx, { ...c, repeatPerThreshold: value })}
           helpText="If enabled: gifts scale by floor(subtotal / thresholdAmount)."
         />
-
-        <TextField
-          label="Choice variant IDs (gifts) (auto-filled)"
-          value={variantIdsToText(c.choiceVariantIds)}
-          onChange={() => undefined}
-          readOnly
-          autoComplete="off"
-        />
-
-        <VariantPicker
-          label="Search gift variants"
-          selectedIds={c.choiceVariantIds}
-          onChange={(next) => updateCampaign(idx, { ...c, choiceVariantIds: uniq(next.map(toGidVariant)) })}
+        <CampaignScopePicker
+          label="Search gifts"
+          value={c.choiceScope}
+          resolvedVariantCount={c.choiceVariantIds.length}
+          helpText="Choose products or collections for free-choice gifts."
+          onChange={(nextScope, nextVariantIds) =>
+            updateCampaign(idx, {
+              ...c,
+              choiceScope: nextScope,
+              choiceVariantIds: nextVariantIds,
+            })
+          }
         />
       </BlockStack>
     );
@@ -922,7 +1428,7 @@ export default function CampaignsPage() {
                             label="ID"
                             value={c.id}
                             onChange={(value: string) => updateCampaign(idx, { ...(c as any), id: String(value || "").trim() })}
-                            helpText="Уникальный ID кампании"
+                            helpText="Unique campaign ID"
                             autoComplete="off"
                           />
 
@@ -990,7 +1496,7 @@ export default function CampaignsPage() {
               </Form>
 
               <Text as="p" tone="subdued">
-                Эти кампании используются твоим backend pricingEngine. После сохранения они лежат в shop metafield{" "}
+                These campaigns are used by your backend pricingEngine. After saving, they are stored in shop metafield{" "}
                 <code>mk.campaigns</code>.
               </Text>
             </BlockStack>

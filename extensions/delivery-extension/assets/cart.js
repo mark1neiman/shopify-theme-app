@@ -65,6 +65,21 @@
       .replaceAll("'", "&#039;");
   }
 
+  function normalizeCampaignLabel(rawLabel, campaignId) {
+    const fallback = "Campaign offer";
+    const label = String(rawLabel || "").trim();
+    const id = String(campaignId || "").trim();
+
+    if (!label) return fallback;
+
+    const technicalPrefix = /^(cmp[-_]|campaign[-_]|promo[-_])/i;
+    const slugOrHash = /^[a-z0-9]+(?:-[a-z0-9]+){2,}$/i;
+    const looksTechnical = technicalPrefix.test(label) || (label.length > 24 && slugOrHash.test(label));
+
+    if ((id && label === id) || looksTechnical) return fallback;
+    return label;
+  }
+
   window.__mkCartGetStats = function () {
     return { ...MK_STATS };
   };
@@ -241,7 +256,7 @@ function mkPickAllocationForCampaign(pricingLines, campaignId, buyQtyNeeded) {
 function mkGetBuyQtyFromMeta(meta) {
   if (!meta || typeof meta !== "object") return 0;
 
-  // максимально терпимый парсер — под разные структуры backend'а
+  // Most tolerant parser possible for different backend payload shapes.
   const candidates = [
     meta.buyQuantity,
     meta.buyQty,
@@ -265,7 +280,7 @@ function mkGetBuyQtyFromMeta(meta) {
   return 0;
 }
 
-// строим allocationMaps ТОЛЬКО для кампаний, которые реально дают gift lines
+// Build allocationMaps ONLY for campaigns that actually produce gift lines.
 function mkBuildAllocMaps(pricing) {
   const maps = new Map(); // campaignId -> Map(variantGid -> allocatedQty)
   const lines = Array.isArray(pricing?.lines) ? pricing.lines : [];
@@ -656,7 +671,7 @@ function mkAllocSumForLine(allocMaps, campaignIds, variantGid) {
           <div class="mk-gift-inline-row">
             ${
               slots.length > 1
-                ? `<label class="mk-gift-inline-label">Подарок ${idx + 1}</label>`
+                ? `<label class="mk-gift-inline-label">Gift ${idx + 1}</label>`
                 : ""
             }
             <select
@@ -830,11 +845,11 @@ function mkAllocSumForLine(allocMaps, campaignIds, variantGid) {
 
     const badges = [];
 
-    if (line.isGiftLine) badges.push("Подарок");
+    if (line.isGiftLine) badges.push("Gift");
 
     const freeUnits = Number(line?.freeUnits || 0);
     if (!line.isGiftLine && Number(line.memberUnitPrice) < Number(line.baseUnitPrice)) badges.push("Member discount");
-    if (line.isGiftLine && line.giftCampaignLabel) badges.push(`Кампания: ${line.giftCampaignLabel}`);
+    if (line.isGiftLine && line.giftCampaignLabel) badges.push(`Campaign: ${line.giftCampaignLabel}`);
     if (!line.isGiftLine && freeUnits > 0) badges.push(`${freeUnits} FREE`);
     if (!line.isGiftLine && freeUnits <= 0 && line.isFree) badges.push("FREE");
     if (Array.isArray(line.appliedCampaignLabels) && line.appliedCampaignLabels.length) {
@@ -898,14 +913,14 @@ function mkAllocSumForLine(allocMaps, campaignIds, variantGid) {
     if (!nodes.length) return;
 
     const campaignLabel = String(options?.campaignLabel || "").trim();
-    const campaignText = campaignLabel ? `по кампании: ${campaignLabel}` : "по кампании";
+    const campaignText = campaignLabel ? `Campaign: ${campaignLabel}` : "Campaign offer";
 
     nodes.forEach((node) => {
       const original = node.getAttribute("data-mk-original-html");
       if (!original) node.setAttribute("data-mk-original-html", node.innerHTML || "");
       node.innerHTML = `
         <span class="mk-gift-price">
-          <span class="mk-gift-price-free">Бесплатно</span>
+          <span class="mk-gift-price-free">Free</span>
         </span>
         <span class="mk-gift-price-campaign">${escapeHtml(campaignText)}</span>
       `;
@@ -1098,12 +1113,12 @@ hideGiftLine(lineRoot);
 
 function applyCampaignLineVisibility(pricing, cart, allocMaps) {
 
-  // Сначала восстановим всё, что раньше прятали
+  // First, restore everything that was hidden previously.
   restoreCampaignHiddenLines();
 
   if (!pricing || !cart || !Array.isArray(cart.items)) return;
 
-  // Определяем какие варианты "полностью заняты" кампанией:
+  // Determine which variants are fully allocated by campaigns:
   // remaining = line.quantity - sum(campaignQuantities[*])
   // hide only if allocated>0 AND remaining<=0
   const fullyAllocatedNumericIds = new Set();
@@ -1125,14 +1140,14 @@ const remaining = qty - allocated;
 
   if (!fullyAllocatedNumericIds.size) return;
 
-  // Теперь прячем ТОЛЬКО реальные строки Shopify по line index из cart.items
-  // (не трогаем campaign-block DOM вообще)
+  // Now hide ONLY real Shopify lines by line index from cart.items
+  // (do not touch campaign-block DOM at all).
   for (let i = 0; i < cart.items.length; i++) {
     const it = cart.items[i];
     if (!it) continue;
 
     const isGift = it?.properties && String(it.properties._mk_gift) === "1";
-    if (isGift) continue; // подарки отдельно уже прячем другим кодом
+    if (isGift) continue; // gift lines are hidden separately by another code path
 
     const numericId = Number(it.variant_id);
     if (!fullyAllocatedNumericIds.has(numericId)) continue;
@@ -1141,7 +1156,7 @@ const remaining = qty - allocated;
     const lineRoot = findLineRootByLineIndex(lineIndex);
     if (!lineRoot) continue;
 
-    // Защита: никогда не прячем ничего внутри campaign-block
+    // Safety: never hide anything inside campaign-block.
     if (lineRoot.closest && lineRoot.closest("[data-mk-campaign-block]")) continue;
 
     lineRoot.setAttribute("data-mk-hidden-by-campaign", "1");
@@ -1462,8 +1477,8 @@ function buildCampaignPayload(pricing, cart, allocMaps) {
         const block = blocksById.get(String(campaignId || ""));
         if (!block) return;
 
-// ✅ ВАЖНО: используем allocationMaps (ограничено buyQty),
-// а не "сырой" campaignQuantities, который может стать 3 при qty=3
+// IMPORTANT: use allocationMaps (limited by buyQty),
+// not raw campaignQuantities, which can become 3 when qty=3.
 const campaignQuantity = mkAllocForLine(allocMaps, campaignId, line.variantId);
 
 if (campaignQuantity <= 0) return;
@@ -1822,6 +1837,13 @@ if (campaignQuantity <= 0) return;
   let pendingReason = "";
   let debounceTimer = null;
   let suppressMutationsUntil = 0;
+  let lastKnownCartItemCount = null;
+  let lastEmptyCartRefreshAt = 0;
+
+  function getCartItemsCount(cartLike) {
+    if (!cartLike || !Array.isArray(cartLike.items)) return null;
+    return cartLike.items.length;
+  }
 
   async function refreshPricing(reason = "unknown", cartHint = null) {
     if (inFlight) {
@@ -1844,10 +1866,16 @@ if (campaignQuantity <= 0) return;
         cartHint && Array.isArray(cartHint.items)
           ? cartHint
           : await readCart();
+      const itemCount = getCartItemsCount(cart);
+      if (itemCount !== null) {
+        lastKnownCartItemCount = itemCount;
+      }
       const attrs = cart.attributes || {};
       knownCartAttributes = attrs;
 
       if (!cart?.items?.length) {
+        lastEmptyCartRefreshAt = Date.now();
+        suppressMutationsUntil = Math.max(suppressMutationsUntil, lastEmptyCartRefreshAt + 1200);
         console.info("[cart.js] no items in cart, skipping prepare preview");
         renderFreeChoicePanel(null, attrs);
         restoreEstimatedTotalDisplay();
@@ -1975,7 +2003,10 @@ renderFreeChoicePanel(pricing, attrs);
 	      const giftChoiceSlotsByLine = buildGiftChoiceSlotsByPricingLine(pricing, giftChoiceModel);
 const campaignLabelById = new Map(
   (Array.isArray(pricing?.appliedCampaigns) ? pricing.appliedCampaigns : [])
-    .map(c => [String(c?.id), String(c?.label || c?.id || "")])
+    .map((c) => {
+      const campaignId = String(c?.id || "");
+      return [campaignId, normalizeCampaignLabel(c?.label, campaignId)];
+    })
 );
 
 	      pricing.lines.forEach((line, pricingLineIndex) => {
@@ -2017,7 +2048,7 @@ if (line.isGiftLine) {
   lockGiftLineControls(lineRoot);
 
   const campId = String(line.giftCampaignId || "");
-  const campLabel = campaignLabelById.get(campId) || campId || "Campaign";
+  const campLabel = normalizeCampaignLabel(campaignLabelById.get(campId), campId);
   lineRoot.setAttribute("data-mk-gift-campaign", campLabel);
   renderGiftChoiceControls(lineRoot, giftChoiceModel, campId, giftChoiceSlotsByLine.get(pricingLineIndex));
   updateGiftLinePriceDisplay(node, {
@@ -2044,10 +2075,10 @@ clearGiftChoiceControls(lineRoot);
 unlockGiftLineDecoration(lineRoot);
 updateLinePriceDisplay(node, isFreeLine);
 
-// показываем обычные бейджи
+// Render regular badges.
 renderBadges(badgeContainer, line);
 
-// remaining/allocated режим включаем ТОЛЬКО если campaign blocks включены
+// Enable remaining/allocated mode ONLY when campaign blocks are enabled.
 if (MK_USE_CAMPAIGN_BLOCKS && allocMaps) {
   const campaignIds = Array.isArray(line.appliedCampaignIds) ? line.appliedCampaignIds : [];
   const allocated = mkAllocSumForLine(allocMaps, campaignIds, line.variantId);
@@ -2081,8 +2112,8 @@ if (MK_USE_CAMPAIGN_BLOCKS && allocMaps) {
     }
   }
 } else {
-	  // Без campaign blocks показываем для BuyXGetOneFree платную часть в основной строке,
-	  // а бесплатную часть — отдельной virtual FREE строкой.
+	  // Without campaign blocks for BuyXGetOneFree:
+	  // keep paid units in the main line and render free units as a separate virtual FREE line.
 	  const totalQty = Math.max(0, Number(line.quantity || 0));
 	  const freeQty = Math.max(0, Number(line.freeUnits || 0));
 	  const paidQty = Math.max(0, totalQty - freeQty);
@@ -2188,6 +2219,25 @@ if (MK_USE_CAMPAIGN_BLOCKS && allocMaps) {
       event?.detail?.cart && Array.isArray(event.detail.cart.items)
         ? event.detail.cart
         : null;
+    const hintedItemCount = getCartItemsCount(cartHint);
+    const hintedHasItems = hintedItemCount !== null && hintedItemCount > 0;
+    const isMutationTriggered = !event;
+
+    if (lastKnownCartItemCount === 0 && !hintedHasItems) {
+      if (isMutationTriggered || event?.type === "cart:refresh") {
+        mkDebug("skip refresh while cart is empty", { source: event?.type || "mutation" });
+        return;
+      }
+
+      if (forceBecauseCartUpdated) {
+        const now = Date.now();
+        if (now - lastEmptyCartRefreshAt < 1200) {
+          mkDebug("throttle empty cart:updated refresh");
+          return;
+        }
+      }
+    }
+
     if (!forceBecauseCartUpdated && Date.now() < suppressMutationsUntil) return;
     mkDebug("scheduleRefresh");
     clearTimeout(debounceTimer);

@@ -1,0 +1,22 @@
+<div data-itella-cart-drawer-runtime hidden></div>
+
+<script>
+  window.__MK_CUSTOMER_LOGGED_IN = {% if customer %}true{% else %}false{% endif %};
+  window.__MK_CUSTOMER_ID = "{{ customer.id | default: '' | escape }}";
+</script>
+
+<script src="{{ 'cart-campaign-ui.js' | asset_url }}" defer></script>
+<script src="{{ 'cart.js' | asset_url }}" defer></script>
+
+{% schema %}
+{
+  "name": "Cart drawer runtime",
+  "target": "section",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Technical helper block. Add this block to cart-drawer to enable campaign logic there."
+    }
+  ]
+}
+{% endschema %}

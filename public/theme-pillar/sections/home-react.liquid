@@ -1,0 +1,2843 @@
+{% liquid
+  assign categories = 'Gel Polish|Nail Tools|UV/LED Lamps|Nail Care|Decorations|Extensions|Kits' | split: '|'
+  assign collection_tiles = 'Gel Base:#2C2926|Salon Equipment:#3B3530|Acryl & Extensions:#4A423B|Nail Art Supplies:#584F47|Body Care:#665C53|Accessories:#5C4A3E' | split: '|'
+  assign popular_searches = 'Gel Polish Sets|Builder Gel|Nail Lamp|French Tips|Nail Art Brushes|Base Coat|Top Coat|Cuticle Oil|Nail Stickers|Polygel Kit|Rubber Base|Chrome Powder' | split: '|'
+  assign feature_tags = 'EU Certified|TPO-Free Gels|Salon Tested|Cruelty-Free' | split: '|'
+  assign all_products_url = routes.all_products_collection_url
+  assign account_register_url = routes.account_register_url
+  assign search_url = routes.search_url
+  assign blog_base_url = routes.root_url | append: 'blogs/news'
+%}
+
+<section id="na-home-{{ section.id }}" class="na-home">
+  <style>
+    #na-home-{{ section.id }} {
+      --na-color-60: #ffffff;
+      --na-color-30: #1a1a1a;
+      --na-color-10: #c8a08c;
+      --na-muted: #6b6b6b;
+      --na-border: #e8e5e3;
+      --na-bg-soft: #f5f3f1;
+      color: var(--na-color-30);
+      font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+      background: var(--na-color-60);
+    }
+
+    #na-home-{{ section.id }} *,
+    #na-home-{{ section.id }} *::before,
+    #na-home-{{ section.id }} *::after {
+      box-sizing: border-box;
+    }
+
+    #na-home-{{ section.id }} a,
+    #na-home-{{ section.id }} button,
+    #na-home-{{ section.id }} input {
+      font: inherit;
+    }
+
+    #na-home-{{ section.id }} button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    #na-home-{{ section.id }} .na-container {
+      width: min(100%, 1415px);
+      margin: 0 auto;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    #na-home-{{ section.id }} .na-pill-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border-radius: 999px;
+      transition: all 0.25s ease;
+      text-decoration: none;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    #na-home-{{ section.id }} .na-section-title {
+      margin: 0;
+      color: var(--na-color-30);
+      letter-spacing: -0.02em;
+    }
+
+    #na-home-{{ section.id }} .na-hero {
+      padding-top: 16px;
+      padding-bottom: 0;
+    }
+
+    #na-home-{{ section.id }} .na-hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    #na-home-{{ section.id }} .na-hero-card {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      min-height: 280px;
+    }
+
+    #na-home-{{ section.id }} .na-hero-card--large {
+      background: #f5f3f1;
+    }
+
+    #na-home-{{ section.id }} .na-hero-card--tall {
+      background: #ede8e3;
+      min-height: 240px;
+    }
+
+    #na-home-{{ section.id }} .na-hero-card--small-a {
+      min-height: 140px;
+      background: #e8e3de;
+    }
+
+    #na-home-{{ section.id }} .na-hero-card--small-b {
+      min-height: 140px;
+      background: #e3ddd7;
+    }
+
+    #na-home-{{ section.id }} .na-hero-large-content {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    #na-home-{{ section.id }} .na-hero-small-content {
+      position: absolute;
+      inset: 0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    #na-home-{{ section.id }} .na-caption {
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-caption-muted {
+      color: #999;
+      font-weight: 500;
+    }
+
+    #na-home-{{ section.id }} .na-hero-title {
+      margin: 0;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      font-size: 28px;
+      font-weight: 700;
+    }
+
+    #na-home-{{ section.id }} .na-hero-tall-inner {
+      position: absolute;
+      inset: 0;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    #na-home-{{ section.id }} .na-hero-discount {
+      color: var(--na-color-30);
+      font-size: 44px;
+      line-height: 1;
+      letter-spacing: -0.03em;
+      font-weight: 800;
+      margin: 0 0 4px;
+    }
+
+    #na-home-{{ section.id }} .na-hero-subtitle {
+      margin: 0 0 12px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--na-color-30);
+      letter-spacing: -0.01em;
+    }
+
+    #na-home-{{ section.id }} .na-hero-note {
+      margin: 0 0 16px;
+      color: var(--na-muted);
+      font-size: 12px;
+      line-height: 1.6;
+      max-width: 220px;
+    }
+
+    #na-home-{{ section.id }} .na-btn-dark {
+      background: var(--na-color-30);
+      color: #fff;
+      padding: 12px 24px;
+      font-size: 13px;
+    }
+
+    #na-home-{{ section.id }} .na-btn-dark:hover {
+      background: #333;
+    }
+
+    #na-home-{{ section.id }} .na-btn-light {
+      background: #fff;
+      color: #2e4a3e;
+      padding: 12px 24px;
+      font-size: 13px;
+    }
+
+    #na-home-{{ section.id }} .na-btn-light:hover {
+      background: var(--na-color-10);
+      color: #fff;
+    }
+
+    #na-home-{{ section.id }} .na-btn-accent {
+      background: var(--na-color-10);
+      color: #fff;
+      padding: 12px 24px;
+      font-size: 13px;
+    }
+
+    #na-home-{{ section.id }} .na-btn-accent:hover {
+      background: #b8907a;
+    }
+
+    #na-home-{{ section.id }} .na-btn-soft {
+      background: rgba(255, 255, 255, 0.5);
+      color: var(--na-color-30);
+      padding: 10px 20px;
+      font-size: 12px;
+    }
+
+    #na-home-{{ section.id }} .na-btn-soft:hover {
+      background: #fff;
+    }
+
+    #na-home-{{ section.id }} .na-promo {
+      margin-top: 16px;
+    }
+
+    #na-home-{{ section.id }} .na-promo-inner {
+      background: #f5ede6;
+      border-radius: 12px;
+      padding: 24px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      align-items: center;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    #na-home-{{ section.id }} .na-promo-label {
+      margin: 0;
+      color: var(--na-color-30);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+
+    #na-home-{{ section.id }} .na-countdown {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #na-home-{{ section.id }} .na-countdown-value {
+      min-width: 36px;
+      font-size: 26px;
+      line-height: 1;
+      font-weight: 700;
+      color: var(--na-color-30);
+      font-variant-numeric: tabular-nums;
+      text-align: center;
+    }
+
+    #na-home-{{ section.id }} .na-countdown-sep {
+      color: rgba(26, 26, 26, 0.4);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1;
+    }
+
+    #na-home-{{ section.id }} .na-promo-desc {
+      display: none;
+      max-width: 220px;
+      color: #3a3a3a;
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    #na-home-{{ section.id }} .na-copy-btn {
+      background: var(--na-color-30);
+      color: #fff;
+      padding: 12px 20px;
+      font-size: 13px;
+    }
+
+    #na-home-{{ section.id }} .na-copy-btn:hover {
+      background: #333;
+    }
+
+    #na-home-{{ section.id }} .na-copy-icon {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      flex-shrink: 0;
+    }
+
+    #na-home-{{ section.id }} .na-categories {
+      margin-top: 8px;
+    }
+
+    #na-home-{{ section.id }} .na-categories-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    #na-home-{{ section.id }} .na-category-card {
+      border: 1px solid var(--na-border);
+      border-radius: 12px;
+      background: #fff;
+      padding: 12px;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-category-card:hover {
+      border-color: var(--na-color-10);
+      box-shadow: 0 6px 16px rgba(17, 17, 17, 0.06);
+    }
+
+    #na-home-{{ section.id }} .na-category-image {
+      aspect-ratio: 1 / 1;
+      background: var(--na-bg-soft);
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+
+    #na-home-{{ section.id }} .na-category-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    #na-home-{{ section.id }} .na-category-name {
+      margin: 0;
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--na-color-30);
+      line-height: 1.35;
+    }
+
+    #na-home-{{ section.id }} .na-category-arrow {
+      width: 28px;
+      height: 28px;
+      border-radius: 999px;
+      border: 1px solid var(--na-border);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    #na-home-{{ section.id }} .na-category-arrow svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #na-home-{{ section.id }} .na-category-card:hover .na-category-arrow {
+      color: var(--na-color-10);
+      border-color: var(--na-color-10);
+    }
+
+    #na-home-{{ section.id }} .na-brands {
+      padding: 32px 0 40px;
+    }
+
+    #na-home-{{ section.id }} .na-brands-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    #na-home-{{ section.id }} .na-brands-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    #na-home-{{ section.id }} .na-view-all {
+      color: var(--na-color-10);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    #na-home-{{ section.id }} .na-view-all:hover {
+      color: #b08a74;
+    }
+
+    #na-home-{{ section.id }} .na-brands-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    #na-home-{{ section.id }} .na-brand-item {
+      height: 56px;
+      border-radius: 10px;
+      border: 1px solid #e5e5e5;
+      background: #fafaf9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      color: #6b6b6b;
+      font-size: 12px;
+      letter-spacing: 0.03em;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      padding: 0 10px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #na-home-{{ section.id }} .na-brand-item:hover {
+      color: var(--na-color-30);
+      border-color: var(--na-color-10);
+      background: #fff;
+    }
+
+    #na-home-{{ section.id }} .na-brands-toggle-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    #na-home-{{ section.id }} .na-brands-toggle {
+      border-radius: 999px;
+      border: 1px solid #e5e5e5;
+      background: transparent;
+      color: var(--na-color-30);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 12px;
+      font-weight: 600;
+      padding: 10px 20px;
+      transition: all 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-brands-toggle:hover {
+      color: var(--na-color-10);
+      border-color: var(--na-color-10);
+    }
+
+    #na-home-{{ section.id }} .na-products {
+      padding: 40px 0 20px;
+    }
+
+    #na-home-{{ section.id }} .na-products-head {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    #na-home-{{ section.id }} .na-products-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--na-color-30);
+    }
+
+    #na-home-{{ section.id }} .na-tabs {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    #na-home-{{ section.id }} .na-tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    #na-home-{{ section.id }} .na-tab {
+      background: transparent;
+      color: #999;
+      border-bottom: 2px solid transparent;
+      font-size: 13px;
+      padding: 0 0 6px;
+      white-space: nowrap;
+      font-weight: 500;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-tab.is-active {
+      color: var(--na-color-30);
+      border-color: var(--na-color-30);
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-tab:hover {
+      color: #3a3a3a;
+    }
+
+    #na-home-{{ section.id }} .na-product-grid,
+    #na-home-{{ section.id }} .na-tools-grid,
+    #na-home-{{ section.id }} .na-favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    #na-home-{{ section.id }} .na-card {
+      cursor: pointer;
+    }
+
+    #na-home-{{ section.id }} .na-card-media {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      overflow: hidden;
+      background: var(--na-bg-soft);
+      margin-bottom: 14px;
+    }
+
+    #na-home-{{ section.id }} .na-card-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      padding: 4px 10px;
+    }
+
+    #na-home-{{ section.id }} .na-badge-sale {
+      background: var(--na-color-10);
+      color: #fff;
+    }
+
+    #na-home-{{ section.id }} .na-badge-bestseller {
+      background: var(--na-color-30);
+      color: #fff;
+    }
+
+    #na-home-{{ section.id }} .na-badge-new {
+      background: #fff;
+      color: var(--na-color-30);
+      border: 1px solid var(--na-border);
+    }
+
+    #na-home-{{ section.id }} .na-card-heart {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 0;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      color: #3a3a3a;
+      transition: background-color 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-card-heart svg,
+    #na-home-{{ section.id }} .na-card-cart svg {
+      width: 15px;
+      height: 15px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #na-home-{{ section.id }} .na-card-heart:hover {
+      background: #fff;
+    }
+
+    #na-home-{{ section.id }} .na-card-quick {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      opacity: 0;
+      transform: translateY(8px);
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    #na-home-{{ section.id }} .na-card-cart {
+      width: 100%;
+      border-radius: 10px;
+      border: 0;
+      background: var(--na-color-30);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-card-cart:hover {
+      background: #333;
+    }
+
+    #na-home-{{ section.id }} .na-card:hover .na-card-heart {
+      display: inline-flex;
+    }
+
+    #na-home-{{ section.id }} .na-card:hover .na-card-quick {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    #na-home-{{ section.id }} .na-card-name {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--na-color-30);
+      line-height: 1.4;
+      transition: color 0.2s ease;
+      display: -webkit-box;
+      -webkit-line-clamp: 1;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    #na-home-{{ section.id }} .na-card:hover .na-card-name {
+      color: var(--na-color-10);
+    }
+
+    #na-home-{{ section.id }} .na-card-prices {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+
+    #na-home-{{ section.id }} .na-card-price {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--na-color-30);
+    }
+
+    #na-home-{{ section.id }} .na-card-price-old {
+      font-size: 13px;
+      color: #999;
+      text-decoration: line-through;
+    }
+
+    #na-home-{{ section.id }} .na-collection-banner {
+      padding: 16px 0;
+    }
+
+    #na-home-{{ section.id }} .na-collection-title {
+      margin: 0 auto 24px;
+      text-align: center;
+      max-width: 760px;
+      font-size: 20px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      line-height: 1.35;
+      color: var(--na-color-30);
+    }
+
+    #na-home-{{ section.id }} .na-collection-title .na-accent {
+      color: var(--na-color-10);
+    }
+
+    #na-home-{{ section.id }} .na-tools-tiles {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    #na-home-{{ section.id }} .na-tool-tile {
+      min-height: 80px;
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      padding: 10px;
+      transition: filter 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-tool-tile:hover {
+      filter: brightness(1.05);
+    }
+
+    #na-home-{{ section.id }} .na-featured {
+      padding: 32px 0 40px;
+    }
+
+    #na-home-{{ section.id }} .na-featured-box {
+      background: #2e4a3e;
+      border-radius: 16px;
+      overflow: hidden;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #na-home-{{ section.id }} .na-featured-left {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #na-home-{{ section.id }} .na-featured-kicker {
+      margin: 0 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    #na-home-{{ section.id }} .na-featured-title {
+      margin: 0 0 16px;
+      color: #fff;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    #na-home-{{ section.id }} .na-featured-text {
+      margin: 0 0 20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 420px;
+    }
+
+    #na-home-{{ section.id }} .na-featured-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      margin-bottom: 20px;
+    }
+
+    #na-home-{{ section.id }} .na-featured-tag {
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 12px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #na-home-{{ section.id }} .na-featured-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--na-color-10);
+      flex-shrink: 0;
+    }
+
+    #na-home-{{ section.id }} .na-featured-right {
+      display: none;
+      flex: 1;
+      position: relative;
+    }
+
+    #na-home-{{ section.id }} .na-featured-image {
+      position: absolute;
+      inset: 24px;
+      border-radius: 16px;
+      background: #d9cec5;
+    }
+
+    #na-home-{{ section.id }} .na-featured-note {
+      position: absolute;
+      right: 24px;
+      bottom: 24px;
+      background: rgba(255, 255, 255, 0.92);
+      backdrop-filter: blur(5px);
+      border-radius: 12px;
+      padding: 16px;
+      max-width: 260px;
+    }
+
+    #na-home-{{ section.id }} .na-featured-note p {
+      margin: 0;
+      color: #3a3a3a;
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    #na-home-{{ section.id }} .na-featured-note a {
+      display: inline-block;
+      margin-top: 8px;
+      color: var(--na-color-10);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-tools,
+    #na-home-{{ section.id }} .na-favorites,
+    #na-home-{{ section.id }} .na-searches {
+      padding: 32px 0 40px;
+    }
+
+    #na-home-{{ section.id }} .na-tools-title,
+    #na-home-{{ section.id }} .na-favorites-title,
+    #na-home-{{ section.id }} .na-searches-title {
+      margin: 0 0 24px;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--na-color-30);
+    }
+
+    #na-home-{{ section.id }} .na-favorites-title,
+    #na-home-{{ section.id }} .na-searches-title {
+      text-align: center;
+    }
+
+    #na-home-{{ section.id }} .na-editorial {
+      padding: 24px 0 16px;
+    }
+
+    #na-home-{{ section.id }} .na-editorial-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    #na-home-{{ section.id }} .na-story {
+      border-radius: 16px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      background: #f5ede6;
+    }
+
+    #na-home-{{ section.id }} .na-story-content {
+      flex: 1;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #na-home-{{ section.id }} .na-story-label,
+    #na-home-{{ section.id }} .na-facts-label {
+      margin: 0 0 12px;
+      color: #999;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-story-title {
+      margin: 0 0 12px;
+      color: var(--na-color-30);
+      font-size: 22px;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+      font-weight: 700;
+    }
+
+    #na-home-{{ section.id }} .na-story-text {
+      margin: 0 0 16px;
+      color: var(--na-muted);
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    #na-home-{{ section.id }} .na-story-link {
+      color: var(--na-color-10);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-story-media {
+      width: 100%;
+      height: 160px;
+      background: #e8ddd5;
+      flex-shrink: 0;
+    }
+
+    #na-home-{{ section.id }} .na-facts {
+      border: 1px solid var(--na-border);
+      border-radius: 16px;
+      background: #fff;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    #na-home-{{ section.id }} .na-facts-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    #na-home-{{ section.id }} .na-fact-num {
+      margin: 0 0 4px;
+      color: var(--na-color-10);
+      font-size: 24px;
+      line-height: 1;
+      font-weight: 700;
+    }
+
+    #na-home-{{ section.id }} .na-fact-label {
+      margin: 0;
+      color: var(--na-muted);
+      font-size: 12px;
+    }
+
+    #na-home-{{ section.id }} .na-showcase {
+      padding: 24px 0 16px;
+    }
+
+    #na-home-{{ section.id }} .na-showcase-box {
+      border-radius: 16px;
+      background: rgba(200, 160, 140, 0.1);
+      padding: 24px;
+      text-align: center;
+    }
+
+    #na-home-{{ section.id }} .na-showcase-title {
+      margin: 0 0 8px;
+      color: var(--na-color-30);
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    #na-home-{{ section.id }} .na-showcase-text {
+      margin: 0 0 20px;
+      color: var(--na-muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    #na-home-{{ section.id }} .na-showcase-text span {
+      color: var(--na-color-10);
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    #na-home-{{ section.id }} .na-showcase-item {
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      background: var(--na-bg-soft);
+    }
+
+    #na-home-{{ section.id }} .na-promo-dual {
+      padding: 24px 0 16px;
+    }
+
+    #na-home-{{ section.id }} .na-promo-dual-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    #na-home-{{ section.id }} .na-promo-dual-card {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      min-height: 200px;
+      background: #1a1a1a;
+    }
+
+    #na-home-{{ section.id }} .na-promo-dual-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.3), transparent);
+    }
+
+    #na-home-{{ section.id }} .na-promo-dual-content {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      padding: 20px;
+    }
+
+    #na-home-{{ section.id }} .na-promo-dual-title {
+      margin: 0;
+      color: #fff;
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    #na-home-{{ section.id }} .na-search-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    #na-home-{{ section.id }} .na-search-chip {
+      border: 1px solid var(--na-border);
+      border-radius: 999px;
+      padding: 8px 14px;
+      text-decoration: none;
+      color: #3a3a3a;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-search-chip:hover {
+      border-color: var(--na-color-10);
+      color: var(--na-color-10);
+    }
+
+    #na-home-{{ section.id }} .na-wide-banner {
+      padding: 24px 0 16px;
+    }
+
+    #na-home-{{ section.id }} .na-wide-banner-box {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      min-height: 280px;
+      background: #1a1a1a;
+    }
+
+    #na-home-{{ section.id }} .na-wide-banner-box::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.1), transparent);
+    }
+
+    #na-home-{{ section.id }} .na-wide-banner-content {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      padding: 24px;
+    }
+
+    #na-home-{{ section.id }} .na-wide-banner-kicker {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-size: 11px;
+      font-weight: 500;
+    }
+
+    #na-home-{{ section.id }} .na-wide-banner-title {
+      margin: 8px 0;
+      color: #fff;
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    #na-home-{{ section.id }} .na-wide-banner-text {
+      margin: 0 0 20px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 340px;
+    }
+
+    #na-home-{{ section.id }} .na-trust {
+      padding: 32px 0 56px;
+    }
+
+    #na-home-{{ section.id }} .na-trust-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    #na-home-{{ section.id }} .na-trust-item {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #na-home-{{ section.id }} .na-trust-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 999px;
+      background: #f5f0ed;
+      color: var(--na-color-10);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      transition: background-color 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-trust-item:hover .na-trust-icon {
+      background: rgba(200, 160, 140, 0.1);
+    }
+
+    #na-home-{{ section.id }} .na-trust-icon svg {
+      width: 22px;
+      height: 22px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #na-home-{{ section.id }} .na-trust-title {
+      margin: 0 0 4px;
+      color: var(--na-color-30);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-trust-desc {
+      margin: 0;
+      color: #999;
+      font-size: 11px;
+    }
+
+    #na-home-{{ section.id }} .na-blog {
+      padding: 40px 0 32px;
+    }
+
+    #na-home-{{ section.id }} .na-blog-header {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    #na-home-{{ section.id }} .na-blog-kicker {
+      margin: 0;
+      color: var(--na-color-10);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-blog-title {
+      margin: 0;
+      color: var(--na-color-30);
+      font-size: 24px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    #na-home-{{ section.id }} .na-blog-link {
+      color: var(--na-color-30);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-blog-link:hover {
+      color: var(--na-color-10);
+    }
+
+    #na-home-{{ section.id }} .na-blog-grid-top {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    #na-home-{{ section.id }} .na-blog-featured {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      padding: 24px;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(135deg, #c8a08c, #a67b68);
+    }
+
+    #na-home-{{ section.id }} .na-blog-featured::before {
+      content: "";
+      position: absolute;
+      top: -70px;
+      right: -70px;
+      width: 220px;
+      height: 220px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    #na-home-{{ section.id }} .na-blog-featured::after {
+      content: "";
+      position: absolute;
+      bottom: -80px;
+      left: 45%;
+      width: 180px;
+      height: 180px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    #na-home-{{ section.id }} .na-blog-meta-top {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      right: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      z-index: 1;
+    }
+
+    #na-home-{{ section.id }} .na-blog-chip {
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 11px;
+      font-weight: 600;
+      line-height: 1;
+    }
+
+    #na-home-{{ section.id }} .na-blog-chip--light {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+
+    #na-home-{{ section.id }} .na-blog-chip--brown {
+      background: rgba(200, 160, 140, 0.15);
+      color: #8b6f5c;
+    }
+
+    #na-home-{{ section.id }} .na-blog-time {
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    #na-home-{{ section.id }} .na-blog-featured-date {
+      margin: 0 0 10px;
+      color: rgba(255, 255, 255, 0.65);
+      font-size: 12px;
+      z-index: 1;
+    }
+
+    #na-home-{{ section.id }} .na-blog-featured-title {
+      margin: 0 0 12px;
+      font-size: 24px;
+      line-height: 1.2;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      max-width: 460px;
+      z-index: 1;
+    }
+
+    #na-home-{{ section.id }} .na-blog-featured-excerpt {
+      margin: 0 0 18px;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 13px;
+      line-height: 1.6;
+      max-width: 420px;
+      z-index: 1;
+    }
+
+    #na-home-{{ section.id }} .na-blog-featured-read {
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #e5e5e5;
+      background: #fafaf9;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary-media {
+      height: 160px;
+      background: linear-gradient(135deg, #e8ddd5, #d4c4b8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary-media::before {
+      content: "";
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      width: 80px;
+      height: 80px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary-top {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #na-home-{{ section.id }} .na-blog-trending {
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(3px);
+      color: #8b6f5c;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 4px 10px;
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary-body {
+      padding: 20px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #999;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    #na-home-{{ section.id }} .na-blog-dot {
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: #ddd;
+      flex-shrink: 0;
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary-title {
+      margin: 0 0 12px;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--na-color-30);
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      transition: color 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary:hover .na-blog-secondary-title {
+      color: var(--na-color-10);
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary-text {
+      margin: 0;
+      color: var(--na-muted);
+      font-size: 13px;
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    #na-home-{{ section.id }} .na-blog-secondary-footer {
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid #e5e5e5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--na-color-10);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-blog-grid-bottom {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small {
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid #e5e5e5;
+      background: #fff;
+      text-decoration: none;
+      color: inherit;
+      display: flex;
+      flex-direction: column;
+      transition: border-color 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small:hover {
+      border-color: rgba(200, 160, 140, 0.4);
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-media {
+      position: relative;
+      height: 140px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-media--business {
+      background: linear-gradient(135deg, #2e4a3e, #1e3a2e);
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-media--techniques {
+      background: linear-gradient(135deg, #3a3a3a, #1a1a1a);
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-media--business::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 60px;
+      height: 60px;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-media--business::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 100px;
+      height: 100px;
+      border-radius: 999px;
+      transform: translate(-50%, -50%);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-media--techniques::before {
+      content: "";
+      position: absolute;
+      right: -18px;
+      bottom: -18px;
+      width: 98px;
+      height: 98px;
+      border-radius: 18px;
+      transform: rotate(12deg);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-media--techniques::after {
+      content: "";
+      position: absolute;
+      left: 16px;
+      top: 16px;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-number {
+      position: absolute;
+      left: 16px;
+      bottom: 8px;
+      color: rgba(255, 255, 255, 0.1);
+      font-size: 72px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      color: #999;
+      font-size: 11px;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-cat {
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 10px;
+      font-weight: 600;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-cat--business {
+      background: rgba(46, 74, 62, 0.1);
+      color: #2e4a3e;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-cat--default {
+      background: rgba(26, 26, 26, 0.08);
+      color: #3a3a3a;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.35;
+      color: var(--na-color-30);
+      letter-spacing: -0.01em;
+      transition: color 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small:hover .na-blog-small-title {
+      color: var(--na-color-10);
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-text {
+      margin: 0;
+      color: #999;
+      font-size: 12px;
+      line-height: 1.5;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small-read {
+      margin-top: auto;
+      font-size: 12px;
+      color: var(--na-color-10);
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    #na-home-{{ section.id }} .na-blog-small:hover .na-blog-small-read {
+      opacity: 1;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter {
+      padding: 24px 0 32px;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-box {
+      background: var(--na-color-10);
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-title {
+      margin: 0;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      text-align: center;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-text {
+      margin: 4px 0 0;
+      color: rgba(255, 255, 255, 0.8);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-form {
+      width: 100%;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-fields {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      flex-direction: column;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-input {
+      width: 100%;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.9);
+      color: #1a1a1a;
+      font-size: 13px;
+      padding: 12px 16px;
+      outline: none;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-input::placeholder {
+      color: #999;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-btn {
+      border-radius: 999px;
+      border: 0;
+      background: #1a1a1a;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 12px 20px;
+      transition: background-color 0.2s ease;
+      white-space: nowrap;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-btn:hover {
+      background: #333;
+    }
+
+    #na-home-{{ section.id }} .na-newsletter-alert {
+      margin: 10px 0 0;
+      color: #fff;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (min-width: 640px) {
+      #na-home-{{ section.id }} .na-container {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      #na-home-{{ section.id }} .na-hero {
+        padding-top: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-hero-title {
+        font-size: 36px;
+      }
+
+      #na-home-{{ section.id }} .na-hero-discount {
+        font-size: 52px;
+      }
+
+      #na-home-{{ section.id }} .na-hero-subtitle {
+        font-size: 18px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-inner {
+        padding: 30px 32px;
+      }
+
+      #na-home-{{ section.id }} .na-countdown {
+        gap: 12px;
+      }
+
+      #na-home-{{ section.id }} .na-countdown-value {
+        min-width: 44px;
+        font-size: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-countdown-sep {
+        font-size: 20px;
+      }
+
+      #na-home-{{ section.id }} .na-categories-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      #na-home-{{ section.id }} .na-category-card {
+        padding: 16px;
+      }
+
+      #na-home-{{ section.id }} .na-category-name {
+        font-size: 13px;
+      }
+
+      #na-home-{{ section.id }} .na-category-arrow {
+        display: inline-flex;
+      }
+
+      #na-home-{{ section.id }} .na-brands {
+        padding: 40px 0;
+      }
+
+      #na-home-{{ section.id }} .na-brands-title {
+        font-size: 22px;
+      }
+
+      #na-home-{{ section.id }} .na-brands-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      #na-home-{{ section.id }} .na-brand-item {
+        height: 72px;
+        font-size: 13px;
+      }
+
+      #na-home-{{ section.id }} .na-products {
+        padding: 56px 0;
+      }
+
+      #na-home-{{ section.id }} .na-products-head {
+        margin-bottom: 40px;
+      }
+
+      #na-home-{{ section.id }} .na-products-title {
+        font-size: 30px;
+      }
+
+      #na-home-{{ section.id }} .na-tabs {
+        gap: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-tab {
+        font-size: 14px;
+      }
+
+      #na-home-{{ section.id }} .na-product-grid,
+      #na-home-{{ section.id }} .na-tools-grid,
+      #na-home-{{ section.id }} .na-favorites-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 24px;
+      }
+
+      #na-home-{{ section.id }} .na-collection-banner {
+        padding-top: 16px;
+        padding-bottom: 16px;
+      }
+
+      #na-home-{{ section.id }} .na-collection-title {
+        font-size: 24px;
+        margin-bottom: 40px;
+      }
+
+      #na-home-{{ section.id }} .na-tools-tiles {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 16px;
+      }
+
+      #na-home-{{ section.id }} .na-tool-tile {
+        min-height: 100px;
+        font-size: 14px;
+      }
+
+      #na-home-{{ section.id }} .na-featured {
+        padding: 40px 0 48px;
+      }
+
+      #na-home-{{ section.id }} .na-featured-left {
+        padding: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-featured-title {
+        font-size: 30px;
+      }
+
+      #na-home-{{ section.id }} .na-featured-text {
+        font-size: 15px;
+      }
+
+      #na-home-{{ section.id }} .na-featured-tag {
+        font-size: 13px;
+      }
+
+      #na-home-{{ section.id }} .na-tools,
+      #na-home-{{ section.id }} .na-favorites,
+      #na-home-{{ section.id }} .na-searches {
+        padding: 40px 0 48px;
+      }
+
+      #na-home-{{ section.id }} .na-tools-title,
+      #na-home-{{ section.id }} .na-favorites-title,
+      #na-home-{{ section.id }} .na-searches-title {
+        font-size: 28px;
+        margin-bottom: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-editorial {
+        padding: 24px 0 24px;
+      }
+
+      #na-home-{{ section.id }} .na-story {
+        flex-direction: row;
+      }
+
+      #na-home-{{ section.id }} .na-story-content,
+      #na-home-{{ section.id }} .na-facts {
+        padding: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-story-title {
+        font-size: 28px;
+      }
+
+      #na-home-{{ section.id }} .na-story-text {
+        font-size: 13px;
+      }
+
+      #na-home-{{ section.id }} .na-fact-num {
+        font-size: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-fact-label {
+        font-size: 13px;
+      }
+
+      #na-home-{{ section.id }} .na-showcase,
+      #na-home-{{ section.id }} .na-promo-dual,
+      #na-home-{{ section.id }} .na-wide-banner {
+        padding: 24px 0;
+      }
+
+      #na-home-{{ section.id }} .na-showcase-box {
+        padding: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-showcase-title {
+        font-size: 26px;
+      }
+
+      #na-home-{{ section.id }} .na-showcase-text {
+        font-size: 14px;
+        margin-bottom: 24px;
+      }
+
+      #na-home-{{ section.id }} .na-showcase-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-dual-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 24px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-dual-card {
+        min-height: 240px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-dual-content {
+        padding: 24px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-dual-title {
+        font-size: 24px;
+      }
+
+      #na-home-{{ section.id }} .na-btn-soft {
+        font-size: 13px;
+        padding: 10px 24px;
+      }
+
+      #na-home-{{ section.id }} .na-search-chip {
+        padding: 10px 18px;
+        font-size: 13px;
+      }
+
+      #na-home-{{ section.id }} .na-wide-banner-box {
+        min-height: 360px;
+      }
+
+      #na-home-{{ section.id }} .na-wide-banner-content {
+        padding: 40px;
+      }
+
+      #na-home-{{ section.id }} .na-wide-banner-title {
+        font-size: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-wide-banner-text {
+        font-size: 14px;
+      }
+
+      #na-home-{{ section.id }} .na-trust {
+        padding: 40px 0 56px;
+      }
+
+      #na-home-{{ section.id }} .na-trust-grid {
+        gap: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-trust-icon {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 16px;
+      }
+
+      #na-home-{{ section.id }} .na-trust-title {
+        font-size: 14px;
+      }
+
+      #na-home-{{ section.id }} .na-trust-desc {
+        font-size: 12px;
+      }
+
+      #na-home-{{ section.id }} .na-blog {
+        padding: 48px 0 36px;
+      }
+
+      #na-home-{{ section.id }} .na-blog-title {
+        font-size: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-blog-featured {
+        padding: 32px;
+        min-height: 340px;
+      }
+
+      #na-home-{{ section.id }} .na-blog-featured-title {
+        font-size: 28px;
+      }
+
+      #na-home-{{ section.id }} .na-newsletter {
+        padding: 24px 0 40px;
+      }
+
+      #na-home-{{ section.id }} .na-newsletter-box {
+        padding: 28px 32px;
+      }
+
+      #na-home-{{ section.id }} .na-newsletter-title {
+        font-size: 20px;
+      }
+
+      #na-home-{{ section.id }} .na-newsletter-text {
+        font-size: 13px;
+      }
+
+      #na-home-{{ section.id }} .na-newsletter-fields {
+        flex-direction: row;
+      }
+
+      #na-home-{{ section.id }} .na-newsletter-input {
+        width: min(100%, 300px);
+      }
+    }
+
+    @media (min-width: 768px) {
+      #na-home-{{ section.id }} .na-hero-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-auto-rows: minmax(240px, 1fr);
+      }
+
+      #na-home-{{ section.id }} .na-hero-card--large,
+      #na-home-{{ section.id }} .na-hero-card--tall {
+        grid-row: span 2;
+      }
+
+      #na-home-{{ section.id }} .na-hero-card {
+        min-height: 200px;
+      }
+
+      #na-home-{{ section.id }} .na-products-head {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+
+      #na-home-{{ section.id }} .na-brands-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      #na-home-{{ section.id }} .na-product-grid,
+      #na-home-{{ section.id }} .na-tools-grid,
+      #na-home-{{ section.id }} .na-favorites-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      #na-home-{{ section.id }} .na-editorial-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      #na-home-{{ section.id }} .na-featured-right {
+        display: block;
+      }
+
+      #na-home-{{ section.id }} .na-trust-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      #na-home-{{ section.id }} .na-blog-header {
+        flex-direction: row;
+        align-items: flex-end;
+        justify-content: space-between;
+      }
+
+      #na-home-{{ section.id }} .na-blog-grid-bottom {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      #na-home-{{ section.id }} .na-newsletter-box {
+        flex-direction: row;
+      }
+
+      #na-home-{{ section.id }} .na-newsletter-title,
+      #na-home-{{ section.id }} .na-newsletter-text {
+        text-align: left;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      #na-home-{{ section.id }} .na-hero-grid {
+        grid-template-columns: 2fr 1fr 1fr;
+        grid-template-rows: repeat(2, minmax(0, 1fr));
+        min-height: 700px;
+      }
+
+      #na-home-{{ section.id }} .na-hero-card--large {
+        grid-column: 1;
+        grid-row: 1 / 3;
+      }
+
+      #na-home-{{ section.id }} .na-hero-card--tall {
+        grid-column: 2;
+        grid-row: 1 / 3;
+      }
+
+      #na-home-{{ section.id }} .na-hero-card--small-a {
+        grid-column: 3;
+        grid-row: 1;
+      }
+
+      #na-home-{{ section.id }} .na-hero-card--small-b {
+        grid-column: 3;
+        grid-row: 2;
+      }
+
+      #na-home-{{ section.id }} .na-hero-large-content {
+        padding: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-hero-title {
+        font-size: 48px;
+      }
+
+      #na-home-{{ section.id }} .na-hero-discount {
+        font-size: 64px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-inner {
+        flex-direction: row;
+        text-align: left;
+        padding: 40px 48px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-desc {
+        display: block;
+      }
+
+      #na-home-{{ section.id }} .na-brands-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      #na-home-{{ section.id }} .na-product-grid,
+      #na-home-{{ section.id }} .na-tools-grid,
+      #na-home-{{ section.id }} .na-favorites-grid {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+
+      #na-home-{{ section.id }} .na-tools-tiles {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+
+      #na-home-{{ section.id }} .na-featured-box {
+        min-height: 400px;
+        flex-direction: row;
+      }
+
+      #na-home-{{ section.id }} .na-featured-left {
+        padding: 48px;
+      }
+
+      #na-home-{{ section.id }} .na-featured-title {
+        font-size: 36px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-dual-card {
+        min-height: 280px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-dual-content {
+        padding: 32px;
+      }
+
+      #na-home-{{ section.id }} .na-promo-dual-title {
+        font-size: 28px;
+      }
+
+      #na-home-{{ section.id }} .na-wide-banner-content {
+        padding: 40px 64px;
+      }
+
+      #na-home-{{ section.id }} .na-wide-banner-title {
+        font-size: 40px;
+      }
+
+      #na-home-{{ section.id }} .na-blog-grid-top {
+        grid-template-columns: 1.6fr 1fr;
+        gap: 20px;
+      }
+
+      #na-home-{{ section.id }} .na-blog-featured {
+        min-height: 380px;
+        padding: 40px;
+      }
+    }
+  </style>
+
+  <div class="na-hero">
+    <div class="na-container">
+      <div class="na-hero-grid">
+        <article class="na-hero-card na-hero-card--large">
+          <div class="na-hero-large-content">
+            <p class="na-caption na-caption-muted">Spring '26 Collection</p>
+            <h1 class="na-hero-title">Professional<br>Gel Polish</h1>
+            <a href="{{ all_products_url }}" class="na-pill-btn na-btn-dark">Shop Collection</a>
+          </div>
+        </article>
+
+        <article class="na-hero-card na-hero-card--tall">
+          <div class="na-hero-tall-inner">
+            <p class="na-caption" style="color:#c8a08c; margin-bottom:12px;">Members Only</p>
+            <p class="na-hero-discount">-20%</p>
+            <p class="na-hero-subtitle">on your first order</p>
+            <p class="na-hero-note">Register at nanails.eu and get your personal discount on the entire catalog</p>
+            <a href="{{ account_register_url }}" class="na-pill-btn na-btn-dark">Create Account</a>
+          </div>
+        </article>
+
+        <article class="na-hero-card na-hero-card--small-a">
+          <div class="na-hero-small-content">
+            <div>
+              <p style="margin:0; font-size:20px; font-weight:700; color:#1a1a1a; line-height:1.2;">Gel Colors</p>
+              <p style="margin:6px 0 0; font-size:13px; color:#999;">Starting at EUR 12.99</p>
+            </div>
+            <a href="{{ all_products_url }}" class="na-pill-btn na-btn-dark" style="padding:8px 20px; font-size:12px;">Shop</a>
+          </div>
+        </article>
+
+        <article class="na-hero-card na-hero-card--small-b">
+          <div class="na-hero-small-content">
+            <div>
+              <p style="margin:0; font-size:20px; font-weight:700; color:#1a1a1a; line-height:1.2;">Nail Care</p>
+              <p style="margin:6px 0 0; font-size:13px; color:#999;">Starting at EUR 8.99</p>
+            </div>
+            <a href="{{ all_products_url }}" class="na-pill-btn na-btn-dark" style="padding:8px 20px; font-size:12px;">Shop</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-promo">
+    <div class="na-container">
+      <div class="na-promo-inner">
+        <p class="na-promo-label">Flash Sale Ending Soon</p>
+
+        <div class="na-countdown" data-na-countdown>
+          <span class="na-countdown-value" data-na-days>05</span>
+          <span class="na-countdown-sep">:</span>
+          <span class="na-countdown-value" data-na-hours>13</span>
+          <span class="na-countdown-sep">:</span>
+          <span class="na-countdown-value" data-na-minutes>27</span>
+          <span class="na-countdown-sep">:</span>
+          <span class="na-countdown-value" data-na-seconds>44</span>
+        </div>
+
+        <p class="na-promo-desc">Save on professional products, bestsellers and more</p>
+
+        <button type="button" class="na-pill-btn na-copy-btn" data-na-copy>
+          <svg class="na-copy-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span data-na-copy-label>Copy Code: NAIL20</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-categories">
+    <div class="na-container">
+      <div class="na-categories-grid">
+        {% for category in categories %}
+          <a href="{{ all_products_url }}" class="na-category-card">
+            <div class="na-category-image"></div>
+            <div class="na-category-meta">
+              <p class="na-category-name">{{ category }}</p>
+              <span class="na-category-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"></path></svg>
+              </span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="na-brands">
+    <div class="na-container">
+      <div class="na-brands-header">
+        <h2 class="na-brands-title">Our Brands</h2>
+        <a href="/pages/brands" class="na-view-all">View All</a>
+      </div>
+
+      <div class="na-brands-grid" data-na-brands-grid></div>
+
+      <div class="na-brands-toggle-wrap">
+        <button type="button" class="na-brands-toggle" data-na-brands-toggle>Show All 45 Brands</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-products">
+    <div class="na-container">
+      <div class="na-products-head">
+        <h2 class="na-products-title">Latest Products</h2>
+        <div class="na-tabs">
+          <button type="button" class="na-tab is-active" data-na-tab="New Arrivals">New Arrivals</button>
+          <button type="button" class="na-tab" data-na-tab="Hot Items">Hot Items</button>
+          <button type="button" class="na-tab" data-na-tab="Bestsellers">Bestsellers</button>
+        </div>
+      </div>
+
+      <div class="na-product-grid" data-na-product-grid></div>
+    </div>
+  </div>
+
+  <div class="na-collection-banner">
+    <div class="na-container">
+      <h2 class="na-collection-title">
+        Explore our collection of <span class="na-accent">Professional Tools</span><br>
+        from top brands in the industry
+      </h2>
+
+      <div class="na-tools-tiles">
+        {% for tile in collection_tiles %}
+          {% assign tile_parts = tile | split: ':' %}
+          <a href="{{ all_products_url }}" class="na-tool-tile" style="background-color: {{ tile_parts[1] }};">{{ tile_parts[0] }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="na-featured">
+    <div class="na-container">
+      <div class="na-featured-box">
+        <div class="na-featured-left">
+          <p class="na-featured-kicker">Quality and Safety</p>
+          <h2 class="na-featured-title">Premium Certified<br>Products Only</h2>
+          <p class="na-featured-text">Every product in our store meets the highest European safety standards. All gels are TPO-free and safe for both nail technicians and clients.</p>
+
+          <div class="na-featured-tags">
+            {% for tag in feature_tags %}
+              <span class="na-featured-tag"><span class="na-featured-dot"></span>{{ tag }}</span>
+            {% endfor %}
+          </div>
+
+          <a href="/pages/contact" class="na-pill-btn na-btn-light">View Certificates</a>
+        </div>
+
+        <div class="na-featured-right">
+          <div class="na-featured-image"></div>
+          <div class="na-featured-note">
+            <p>All our gels are formulated without TPO photoinitiators. Safe for sensitive clients and professionals alike.</p>
+            <a href="/pages/about">Learn more -></a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-tools">
+    <div class="na-container">
+      <h2 class="na-tools-title">Shop By Gel Systems</h2>
+      <div class="na-tools-grid" data-na-tools-grid></div>
+    </div>
+  </div>
+
+  <div class="na-editorial">
+    <div class="na-container">
+      <div class="na-editorial-grid">
+        <article class="na-story">
+          <div class="na-story-content">
+            <p class="na-story-label">The nanails story</p>
+            <h3 class="na-story-title">Quality<br>Standards</h3>
+            <p class="na-story-text">European-made formulas with salon-grade performance. Trusted by professionals.</p>
+            <a href="/pages/about" class="na-story-link">Read more -></a>
+          </div>
+          <div class="na-story-media"></div>
+        </article>
+
+        <article class="na-facts">
+          <p class="na-facts-label">Company facts</p>
+          <div class="na-facts-grid">
+            <div>
+              <p class="na-fact-num">500+</p>
+              <p class="na-fact-label">Professional Products</p>
+            </div>
+            <div>
+              <p class="na-fact-num">25K+</p>
+              <p class="na-fact-label">Salon Partners</p>
+            </div>
+            <div>
+              <p class="na-fact-num">15+</p>
+              <p class="na-fact-label">European Countries</p>
+            </div>
+            <div>
+              <p class="na-fact-num">99%</p>
+              <p class="na-fact-label">Customer Satisfaction</p>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-showcase">
+    <div class="na-container">
+      <div class="na-showcase-box">
+        <h2 class="na-showcase-title">Showcase Us</h2>
+        <p class="na-showcase-text">Share your work using <span>#nanails</span> and get featured</p>
+        <div class="na-showcase-grid">
+          <div class="na-showcase-item"></div>
+          <div class="na-showcase-item"></div>
+          <div class="na-showcase-item"></div>
+          <div class="na-showcase-item"></div>
+          <div class="na-showcase-item"></div>
+          <div class="na-showcase-item"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-promo-dual">
+    <div class="na-container">
+      <div class="na-promo-dual-grid">
+        <article class="na-promo-dual-card">
+          <div class="na-promo-dual-content">
+            <h3 class="na-promo-dual-title">Gel Collection<br>Essentials</h3>
+            <a href="{{ all_products_url }}" class="na-pill-btn na-btn-soft" style="margin-top:14px;">Shop Now</a>
+          </div>
+        </article>
+
+        <article class="na-promo-dual-card">
+          <div class="na-promo-dual-content">
+            <h3 class="na-promo-dual-title">25% Off<br>Care Products</h3>
+            <a href="{{ all_products_url }}" class="na-pill-btn na-btn-soft" style="margin-top:14px;">Shop Now</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-favorites">
+    <div class="na-container">
+      <h2 class="na-favorites-title">Pro Favorites</h2>
+      <div class="na-favorites-grid" data-na-favorites-grid></div>
+    </div>
+  </div>
+
+  <div class="na-searches">
+    <div class="na-container">
+      <h2 class="na-searches-title">Explore Popular Searches</h2>
+      <div class="na-search-cloud">
+        {% for term in popular_searches %}
+          <a href="{{ search_url }}?q={{ term | url_encode }}" class="na-search-chip">{{ term }}</a>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <div class="na-wide-banner">
+    <div class="na-container">
+      <div class="na-wide-banner-box">
+        <div class="na-wide-banner-content">
+          <div>
+            <p class="na-wide-banner-kicker">Access Exclusive Deals</p>
+            <h2 class="na-wide-banner-title">Become a nanails<br>Professional Partner</h2>
+            <p class="na-wide-banner-text">Get wholesale pricing, priority shipping, and exclusive access to new collections.</p>
+            <a href="/pages/contact" class="na-pill-btn na-btn-accent">Apply Now</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-trust">
+    <div class="na-container">
+      <div class="na-trust-grid">
+        <article class="na-trust-item">
+          <span class="na-trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 7h15l3 4v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"></path><path d="M16 19a4 4 0 0 0 0-8h-1"></path><path d="M3 11h10"></path></svg>
+          </span>
+          <h4 class="na-trust-title">Free Shipping</h4>
+          <p class="na-trust-desc">On orders over EUR 50</p>
+        </article>
+
+        <article class="na-trust-item">
+          <span class="na-trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+          </span>
+          <h4 class="na-trust-title">Secure Payment</h4>
+          <p class="na-trust-desc">SSL encrypted checkout</p>
+        </article>
+
+        <article class="na-trust-item">
+          <span class="na-trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+          </span>
+          <h4 class="na-trust-title">Easy Returns</h4>
+          <p class="na-trust-desc">30-day return policy</p>
+        </article>
+
+        <article class="na-trust-item">
+          <span class="na-trust-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M4 15v-2a8 8 0 0 1 16 0v2"></path><rect x="2" y="14" width="4" height="6" rx="2"></rect><rect x="18" y="14" width="4" height="6" rx="2"></rect><path d="M18 20a4 4 0 0 1-4 4h-2"></path></svg>
+          </span>
+          <h4 class="na-trust-title">Expert Support</h4>
+          <p class="na-trust-desc">Professional advice 24/7</p>
+        </article>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-blog">
+    <div class="na-container">
+      <div class="na-blog-header">
+        <div>
+          <p class="na-blog-kicker">From the Blog</p>
+          <h2 class="na-blog-title">News and Pro Tips</h2>
+        </div>
+        <a href="{{ blog_base_url }}" class="na-blog-link">View All Articles -></a>
+      </div>
+
+      <div class="na-blog-grid-top">
+        <a href="{{ blog_base_url }}/tpo-free-gels-european-salons" class="na-blog-featured">
+          <div class="na-blog-meta-top">
+            <span class="na-blog-chip na-blog-chip--light">Education</span>
+            <span class="na-blog-time">5 min</span>
+          </div>
+          <p class="na-blog-featured-date">Feb 20, 2026</p>
+          <h3 class="na-blog-featured-title">TPO-Free Gels: Why European Salons Are Making the Switch</h3>
+          <p class="na-blog-featured-excerpt">Understanding the science behind TPO-free formulas and why they are becoming the new industry standard for professional nail technicians.</p>
+          <span class="na-blog-featured-read">Read Article -></span>
+        </a>
+
+        <a href="{{ blog_base_url }}/spring-2026-colour-forecast" class="na-blog-secondary">
+          <div class="na-blog-secondary-media">
+            <div class="na-blog-secondary-top">
+              <span class="na-blog-chip na-blog-chip--brown">Trends</span>
+              <span class="na-blog-trending">Trending</span>
+            </div>
+          </div>
+          <div class="na-blog-secondary-body">
+            <div class="na-blog-secondary-meta">
+              <span>Feb 14, 2026</span>
+              <span class="na-blog-dot"></span>
+              <span>4 min</span>
+            </div>
+            <h4 class="na-blog-secondary-title">Spring 2026 Colour Forecast: Shades Every Nail Pro Should Stock</h4>
+            <p class="na-blog-secondary-text">From soft lavenders to warm terracotta, the trending palettes that clients will be requesting this season.</p>
+            <div class="na-blog-secondary-footer">
+              <span>Read more</span>
+              <span>Save</span>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <div class="na-blog-grid-bottom">
+        <a href="{{ blog_base_url }}/profitable-nail-station-equipment" class="na-blog-small">
+          <div class="na-blog-small-media na-blog-small-media--business">
+            <span class="na-blog-small-number">03</span>
+          </div>
+          <div class="na-blog-small-body">
+            <div class="na-blog-small-meta">
+              <span class="na-blog-small-cat na-blog-small-cat--business">Business</span>
+              <span>Feb 8, 2026</span>
+              <span>6 min</span>
+            </div>
+            <h4 class="na-blog-small-title">How to Set Up a Profitable Nail Station: Equipment Checklist</h4>
+            <p class="na-blog-small-text">Essential salon equipment guide from LED lamps to dust collectors, curated for professionals starting out.</p>
+            <span class="na-blog-small-read">Read article -></span>
+          </div>
+        </a>
+
+        <a href="{{ blog_base_url }}/builder-gel-application-mistakes" class="na-blog-small">
+          <div class="na-blog-small-media na-blog-small-media--techniques">
+            <span class="na-blog-small-number">04</span>
+          </div>
+          <div class="na-blog-small-body">
+            <div class="na-blog-small-meta">
+              <span class="na-blog-small-cat na-blog-small-cat--default">Techniques</span>
+              <span>Jan 30, 2026</span>
+              <span>7 min</span>
+            </div>
+            <h4 class="na-blog-small-title">Builder Gel Application: Common Mistakes and How to Fix Them</h4>
+            <p class="na-blog-small-text">Master the apex, avoid lifting, and achieve flawless structure with pro tips from certified educators.</p>
+            <span class="na-blog-small-read">Read article -></span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-newsletter">
+    <div class="na-container">
+      <div class="na-newsletter-box">
+        <div>
+          <h3 class="na-newsletter-title">Sign up for promotions</h3>
+          <p class="na-newsletter-text">Subscribe and save 15% on your first order</p>
+        </div>
+
+        {% form 'customer', class: 'na-newsletter-form' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="na-newsletter-fields">
+            <input
+              type="email"
+              name="contact[email]"
+              class="na-newsletter-input"
+              placeholder="Enter your email"
+              aria-label="Email"
+              required
+            >
+            <button type="submit" class="na-newsletter-btn">Subscribe</button>
+          </div>
+          {% if form.posted_successfully? %}
+            <p class="na-newsletter-alert">Thanks for subscribing.</p>
+          {% elsif form.errors %}
+            <p class="na-newsletter-alert">{{ form.errors | default_errors }}</p>
+          {% endif %}
+        {% endform %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var root = document.getElementById('na-home-{{ section.id }}');
+      if (!root || root.dataset.naInit === 'true') return;
+      root.dataset.naInit = 'true';
+      var allProductsUrl = {{ all_products_url | json }};
+
+      var brands = [
+        'Molokom', 'Holy Molly', 'Belom', 'Imen', 'Imenka',
+        'Semilac', 'Indigo Nails', 'NeoNail', 'Gelish', 'OPI', 'CND Shellac',
+        'Kodi Professional', 'Komilfo', 'Oxxi Professional', 'Global Fashion',
+        'Siller Professional', 'Lovely', 'Naomi', 'FOX', 'Couture Colour',
+        'Moon Full', 'Podomonium', 'Staleks', 'Gehwol', 'Alessandro',
+        'LCN', 'IBD', 'Young Nails', 'Presto', 'Akzentz',
+        'Bio Sculpture', 'Light Elegance', 'Luxio', 'Apres', 'Ugly Duckling',
+        'Orly', 'Essie', 'Zoya', 'LeChat', 'Revel Nail',
+        'Kiara Sky', 'DND', 'Modelones', 'Beetles', 'Makartt'
+      ];
+
+      var productsByTab = {
+        'New Arrivals': [
+          { name: 'Luxe Gel Polish - Nude Rose', price: 'EUR 14.99', badge: 'New' },
+          { name: 'Professional Base Coat', price: 'EUR 11.99' },
+          { name: 'UV/LED Nail Lamp 48W', price: 'EUR 39.99', oldPrice: 'EUR 54.99', badge: 'Sale' },
+          { name: 'Nail Art Brush Set (15 pcs)', price: 'EUR 18.99', badge: 'Bestseller' },
+          { name: 'Cuticle Oil - Almond', price: 'EUR 7.99' },
+          { name: 'Glitter Collection Set', price: 'EUR 22.99', badge: 'New' },
+          { name: 'Gel Extension Kit', price: 'EUR 34.99', oldPrice: 'EUR 44.99', badge: 'Sale' },
+          { name: 'Matte Top Coat', price: 'EUR 9.99' },
+          { name: 'Pro Nail File Set (3 pcs)', price: 'EUR 5.99' },
+          { name: 'Hand Cream Professional', price: 'EUR 12.99', badge: 'Bestseller' }
+        ],
+        'Bestsellers': [
+          { name: 'Luxe Gel Polish - Nude Rose', price: 'EUR 14.99', badge: 'Bestseller' },
+          { name: 'UV/LED Nail Lamp 48W', price: 'EUR 39.99', badge: 'Bestseller' },
+          { name: 'Nail Art Brush Set (15 pcs)', price: 'EUR 18.99', badge: 'Bestseller' },
+          { name: 'Gel Extension Kit', price: 'EUR 34.99', oldPrice: 'EUR 44.99', badge: 'Sale' },
+          { name: 'Professional Base Coat', price: 'EUR 11.99' },
+          { name: 'Glitter Collection Set', price: 'EUR 22.99' },
+          { name: 'Hand Cream Professional', price: 'EUR 12.99' },
+          { name: 'Matte Top Coat', price: 'EUR 9.99' },
+          { name: 'Cuticle Oil - Almond', price: 'EUR 7.99' },
+          { name: 'Pro Nail File Set (3 pcs)', price: 'EUR 5.99' }
+        ],
+        'Hot Items': [
+          { name: 'UV/LED Nail Lamp 48W', price: 'EUR 39.99', oldPrice: 'EUR 54.99', badge: 'Sale' },
+          { name: 'Luxe Gel Polish - Nude Rose', price: 'EUR 14.99', badge: 'New' },
+          { name: 'Glitter Collection Set', price: 'EUR 22.99' },
+          { name: 'Gel Extension Kit', price: 'EUR 34.99', oldPrice: 'EUR 44.99', badge: 'Sale' },
+          { name: 'Hand Cream Professional', price: 'EUR 12.99', badge: 'Bestseller' },
+          { name: 'Professional Base Coat', price: 'EUR 11.99' },
+          { name: 'Nail Art Brush Set (15 pcs)', price: 'EUR 18.99' },
+          { name: 'Cuticle Oil - Almond', price: 'EUR 7.99' },
+          { name: 'Matte Top Coat', price: 'EUR 9.99' },
+          { name: 'Pro Nail File Set (3 pcs)', price: 'EUR 5.99' }
+        ]
+      };
+
+      var shopByProducts = [
+        { name: 'Nude Collection 6-Pack', price: 'EUR 49.99', oldPrice: 'EUR 64.99', badge: 'Sale' },
+        { name: 'French Manicure Set', price: 'EUR 24.99', badge: 'Bestseller' },
+        { name: 'Builder Gel Clear 30ml', price: 'EUR 16.99' },
+        { name: 'Polygel Starter Kit', price: 'EUR 42.99', badge: 'New' },
+        { name: 'Rubber Base Coat 15ml', price: 'EUR 13.99' }
+      ];
+
+      var favorites = [
+        { name: 'Starter Kit Premium', price: 'EUR 69.99', oldPrice: 'EUR 89.99', badge: 'Sale' },
+        { name: 'Nail Art Decoration Set', price: 'EUR 28.99', badge: 'Bestseller' },
+        { name: 'Professional Lamp 96W', price: 'EUR 59.99' },
+        { name: 'Cuticle Oil Set 3-Pack', price: 'EUR 19.99', badge: 'New' },
+        { name: 'Gel Remover Kit', price: 'EUR 14.99' }
+      ];
+
+      var icons = {
+        heart: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.4-9.4-8.5C.8 9.3 2.1 5.5 5.8 4.7c2.1-.5 4.3.3 5.6 2.1 1.3-1.8 3.5-2.6 5.6-2.1 3.7.8 5 4.6 3.2 7.8C19 16.6 12 21 12 21z"></path></svg>',
+        bag: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 8h12l-1 12H7L6 8z"></path><path d="M9 8V6a3 3 0 1 1 6 0v2"></path></svg>'
+      };
+
+      function escapeHtml(value) {
+        return String(value)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#39;');
+      }
+
+      function cardTemplate(product) {
+        var badgeClass = '';
+        if (product.badge === 'Sale') badgeClass = 'na-badge-sale';
+        if (product.badge === 'Bestseller') badgeClass = 'na-badge-bestseller';
+        if (product.badge === 'New') badgeClass = 'na-badge-new';
+
+        return [
+          '<article class="na-card">',
+            '<div class="na-card-media">',
+              product.badge ? '<span class="na-card-badge ' + badgeClass + '">' + escapeHtml(product.badge) + '</span>' : '',
+              '<button type="button" class="na-card-heart" aria-label="Add to favorites">' + icons.heart + '</button>',
+              '<div class="na-card-quick">',
+                '<button type="button" class="na-card-cart">' + icons.bag + 'Add to Cart</button>',
+              '</div>',
+            '</div>',
+            '<h3 class="na-card-name">' + escapeHtml(product.name) + '</h3>',
+            '<div class="na-card-prices">',
+              '<span class="na-card-price">' + escapeHtml(product.price) + '</span>',
+              product.oldPrice ? '<span class="na-card-price-old">' + escapeHtml(product.oldPrice) + '</span>' : '',
+            '</div>',
+          '</article>'
+        ].join('');
+      }
+
+      function renderCards(target, items) {
+        if (!target) return;
+        target.innerHTML = items.map(cardTemplate).join('');
+      }
+
+      var brandGrid = root.querySelector('[data-na-brands-grid]');
+      var brandToggle = root.querySelector('[data-na-brands-toggle]');
+      var showAllBrands = false;
+      var initialBrands = 20;
+
+      function renderBrands() {
+        if (!brandGrid) return;
+        var visible = showAllBrands ? brands : brands.slice(0, initialBrands);
+        brandGrid.innerHTML = visible
+          .map(function (brand) {
+            return '<a class="na-brand-item" href="' + allProductsUrl + '">' + escapeHtml(brand) + '</a>';
+          })
+          .join('');
+
+        if (!brandToggle) return;
+        brandToggle.textContent = showAllBrands ? 'Show Less' : 'Show All ' + brands.length + ' Brands';
+      }
+
+      if (brandToggle) {
+        brandToggle.addEventListener('click', function () {
+          showAllBrands = !showAllBrands;
+          renderBrands();
+        });
+      }
+      renderBrands();
+
+      var activeTab = 'New Arrivals';
+      var productGrid = root.querySelector('[data-na-product-grid]');
+      var tabButtons = root.querySelectorAll('[data-na-tab]');
+
+      function renderActiveTab() {
+        renderCards(productGrid, productsByTab[activeTab] || productsByTab['New Arrivals']);
+        tabButtons.forEach(function (button) {
+          button.classList.toggle('is-active', button.getAttribute('data-na-tab') === activeTab);
+        });
+      }
+
+      tabButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+          var tab = button.getAttribute('data-na-tab');
+          if (!tab || tab === activeTab) return;
+          activeTab = tab;
+          renderActiveTab();
+        });
+      });
+
+      renderActiveTab();
+      renderCards(root.querySelector('[data-na-tools-grid]'), shopByProducts);
+      renderCards(root.querySelector('[data-na-favorites-grid]'), favorites);
+
+      var copyButton = root.querySelector('[data-na-copy]');
+      var copyLabel = root.querySelector('[data-na-copy-label]');
+      var copiedTimeout;
+
+      if (copyButton && copyLabel) {
+        copyButton.addEventListener('click', function () {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText('NAIL20').catch(function () {});
+          }
+
+          copyLabel.textContent = 'Copied!';
+          window.clearTimeout(copiedTimeout);
+          copiedTimeout = window.setTimeout(function () {
+            copyLabel.textContent = 'Copy Code: NAIL20';
+          }, 2000);
+        });
+      }
+
+      var countdownDays = root.querySelector('[data-na-days]');
+      var countdownHours = root.querySelector('[data-na-hours]');
+      var countdownMinutes = root.querySelector('[data-na-minutes]');
+      var countdownSeconds = root.querySelector('[data-na-seconds]');
+
+      var timeLeft = {
+        days: 5,
+        hours: 13,
+        minutes: 27,
+        seconds: 44
+      };
+
+      function pad(n) {
+        return String(n).padStart(2, '0');
+      }
+
+      function renderCountdown() {
+        if (!countdownDays || !countdownHours || !countdownMinutes || !countdownSeconds) return;
+        countdownDays.textContent = pad(timeLeft.days);
+        countdownHours.textContent = pad(timeLeft.hours);
+        countdownMinutes.textContent = pad(timeLeft.minutes);
+        countdownSeconds.textContent = pad(timeLeft.seconds);
+      }
+
+      function tickCountdown() {
+        if (
+          timeLeft.days <= 0 &&
+          timeLeft.hours <= 0 &&
+          timeLeft.minutes <= 0 &&
+          timeLeft.seconds <= 0
+        ) {
+          return;
+        }
+
+        timeLeft.seconds -= 1;
+        if (timeLeft.seconds < 0) {
+          timeLeft.seconds = 59;
+          timeLeft.minutes -= 1;
+        }
+        if (timeLeft.minutes < 0) {
+          timeLeft.minutes = 59;
+          timeLeft.hours -= 1;
+        }
+        if (timeLeft.hours < 0) {
+          timeLeft.hours = 23;
+          timeLeft.days -= 1;
+        }
+        if (timeLeft.days < 0) {
+          timeLeft.days = 0;
+          timeLeft.hours = 0;
+          timeLeft.minutes = 0;
+          timeLeft.seconds = 0;
+        }
+
+        renderCountdown();
+      }
+
+      renderCountdown();
+      window.setInterval(tickCountdown, 1000);
+    })();
+  </script>
+</section>
+
+{% schema %}
+{
+  "name": "Home React",
+  "tag": "section",
+  "class": "section"
+}
+{% endschema %}

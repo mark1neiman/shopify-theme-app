@@ -94,10 +94,10 @@ function normalizeRateProvider(rateProvider: any): {
   return { amount: null, currency: null };
 }
 
-// Небольшая защита от взрывного количества данных
-const PAGE_PROFILES = 25; // можно 10-25
-const PAGE_ZONES = 25; // было 50
-const PAGE_METHODS = 25; // было 50
+// Small safeguard against explosive data volume
+const PAGE_PROFILES = 25; // recommended range: 10-25
+const PAGE_ZONES = 25; // was 50
+const PAGE_METHODS = 25; // was 50
 
 // ------------------------------
 // Queries (split to stay under cost)

@@ -53,7 +53,7 @@
       .saved { color: #2f8f2f; font-weight: 700; }
       .grand td { font-size: 17px; line-height: 24px; font-weight: 700; }
 
-      .cta { background: #f6873a; border-radius: 4px; }
+      .cta { background: #2f8f2f; border-radius: 4px; }
       .cta a {
         display: block;
         padding: 13px 14px;
@@ -72,16 +72,6 @@
         font-weight: 700;
         color: #ffffff !important;
         text-align: center;
-      }
-
-      .feature { background: #2f8f2f; }
-      .feature td {
-        color: #ffffff;
-        font-size: 12px;
-        line-height: 16px;
-        font-weight: 600;
-        text-align: center;
-        padding: 11px 8px;
       }
 
       @media screen and (max-width: 680px) {
@@ -284,13 +274,6 @@
                     </tr>
                   </table>
 
-                  {% assign earned_credit = order.total_price | times: 0.1 %}
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top: 10px; border: 1px solid #2f8f2f;">
-                    <tr>
-                      <td style="background:#2f8f2f; color:#ffffff; font-size:14px; line-height:18px; font-weight:700; padding:10px 12px;">Loyalty Credit Earned</td>
-                      <td style="text-align:right; color:#2f8f2f; font-size:24px; line-height:26px; font-weight:700; padding:10px 12px; white-space:nowrap;">{{ earned_credit | money }}</td>
-                    </tr>
-                  </table>
                 </td>
               </tr>
 
@@ -350,7 +333,7 @@
                     {% if order.order_status_url != blank %}
                       <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                         <tr>
-                          <td class="cta"><a href="{{ order.order_status_url }}">Check Order Status</a></td>
+                          <td class="cta-secondary"><a href="{{ order.order_status_url }}">Check Order Status</a></td>
                         </tr>
                       </table>
                     {% endif %}
@@ -377,18 +360,6 @@
                 <td class="content" style="padding-top: 10px; padding-bottom: 4px;"><div class="hr"></div></td>
               </tr>
 
-              <tr>
-                <td class="content" style="padding-top: 6px;">
-                  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" class="feature">
-                    <tr>
-                      <td>10% credit on every order</td>
-                      <td>Quality and delivery guaranteed</td>
-                      <td>Authentic products</td>
-                      <td>Shipping to 150+ countries</td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
             {% endif %}
 
             <tr>

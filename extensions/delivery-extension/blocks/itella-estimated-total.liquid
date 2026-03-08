@@ -52,10 +52,11 @@
 <style>
   .mk-estimated-total-card {
     border-radius: 16px;
-    padding: 20px;
-    background: #f3f4f6;
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid #d9dee3;
     display: grid;
-    gap: 8px;
+    gap: 10px;
   }
 
   .mk-estimated-total-row {
@@ -66,30 +67,33 @@
   }
 
   .mk-estimated-total-title {
-    font-size: 30px;
-    line-height: 1.15;
+    font-size: 18px;
+    line-height: 1.2;
     font-weight: 700;
-    letter-spacing: -0.02em;
+    letter-spacing: -0.01em;
+    color: #111827;
   }
 
   .mk-estimated-total-value {
-    font-size: 30px;
-    line-height: 1.15;
+    font-size: 34px;
+    line-height: 1;
     font-weight: 700;
     letter-spacing: -0.02em;
     white-space: nowrap;
+    color: #111827;
   }
 
   .mk-estimated-total-note {
     margin: 0;
-    font-size: 14px;
+    font-size: 12px;
     line-height: 1.4;
-    opacity: 0.84;
+    color: #6b7280;
   }
 
   .mk-estimated-total-meta {
     display: grid;
-    gap: 6px;
+    gap: 8px;
+    padding-top: 2px;
   }
 
   .mk-estimated-total-meta-row {
@@ -100,37 +104,42 @@
   }
 
   .mk-estimated-total-meta-label {
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1.3;
-    opacity: 0.78;
+    color: #374151;
   }
 
   .mk-estimated-total-meta-value {
-    font-size: 14px;
+    font-size: 15px;
     line-height: 1.3;
     font-weight: 600;
     white-space: nowrap;
+    color: #111827;
   }
 
   .mk-estimated-total-meta-row--discount .mk-estimated-total-meta-value {
-    color: #15803d;
+    color: #c62828;
   }
 
   .mk-estimated-total-promo-note {
     margin: 2px 0 0;
     font-size: 12px;
     line-height: 1.35;
-    color: #b91c1c;
+    color: #92400e;
   }
 
   @media (max-width: 749px) {
     .mk-estimated-total-card {
-      padding: 16px;
+      padding: 14px;
     }
 
     .mk-estimated-total-title,
     .mk-estimated-total-value {
-      font-size: 24px;
+      font-size: 26px;
+    }
+
+    .mk-estimated-total-title {
+      font-size: 17px;
     }
   }
 </style>

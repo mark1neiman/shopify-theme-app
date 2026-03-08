@@ -4,7 +4,7 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider as ShopifyAppProvider } from "@shopify/shopify-app-react-router/react";
 
 import { AppProvider as PolarisAppProvider } from "@shopify/polaris";
-import enTranslations from "@shopify/polaris/locales/en.json"; // или нужная локаль
+import enTranslations from "@shopify/polaris/locales/en.json"; // or your required locale
 import "@shopify/polaris/build/esm/styles.css";
 
 import { authenticate } from "../shopify.server";

@@ -676,7 +676,7 @@
 
     function isTallinn() {
       const city = getCityValue();
-      return state.country === "EE" && (city.includes("tallinn") || city.includes("таллин"));
+      return state.country === "EE" && (city.includes("tallinn") || city.includes("tallin"));
     }
 
     function shouldInvalidateDraft(prevAttrs, nextAttrs) {
@@ -1320,7 +1320,7 @@
       }
 
       woltWrap.hidden = false;
-      woltWrap.style.display = "flex";
+      woltWrap.style.display = "grid";
 
       const tallinnAllowed = isTallinn();
       if (!tallinnAllowed) {

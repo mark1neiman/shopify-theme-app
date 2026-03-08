@@ -113,7 +113,7 @@ export default function CampaignEditPage() {
         <label>
           Config JSON
           <div style={{ fontSize: 13, opacity: 0.7, marginBottom: 6 }}>
-            Вставляй variant GID’ы. Быстро найти: /app/api/variants?q=...
+            Paste variant GIDs. Quick search: /app/api/variants?q=...
           </div>
           <textarea
             name="configJson"

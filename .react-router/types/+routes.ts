@@ -69,6 +69,9 @@ type Pages = {
   "/app/api/variants": {
     params: {};
   };
+  "/app/api/catalog": {
+    params: {};
+  };
   "/app/promo-codes": {
     params: {};
   };
@@ -91,7 +94,7 @@ type Pages = {
 type RouteFiles = {
   "root.tsx": {
     id: "root";
-    page: "/" | "/apps/checkout/invoice/:documentId" | "/apps/checkout/saved-products" | "/apps/checkout/pickup-config" | "/webhooks/app/scopes_update" | "/webhooks/app/uninstalled" | "/webhooks/orders/create" | "/apps/checkout/prepare" | "/webhooks/orders/paid" | "/apps/pickup-config" | "/apps/pickup-config/draft-order" | "/apps/draft-order" | "/auth/login" | "/auth/*" | "/app" | "/app/api/invoice-jobs/process" | "/app/pickup-settings" | "/app/api/variants" | "/app/promo-codes" | "/app/additional" | "/app/campaigns" | "/app/campaigns/:id" | "/app/invoice";
+    page: "/" | "/apps/checkout/invoice/:documentId" | "/apps/checkout/saved-products" | "/apps/checkout/pickup-config" | "/webhooks/app/scopes_update" | "/webhooks/app/uninstalled" | "/webhooks/orders/create" | "/apps/checkout/prepare" | "/webhooks/orders/paid" | "/apps/pickup-config" | "/apps/pickup-config/draft-order" | "/apps/draft-order" | "/auth/login" | "/auth/*" | "/app" | "/app/api/invoice-jobs/process" | "/app/pickup-settings" | "/app/api/variants" | "/app/api/catalog" | "/app/promo-codes" | "/app/additional" | "/app/campaigns" | "/app/campaigns/:id" | "/app/invoice";
   };
   "routes/apps.checkout.invoice.$documentId.ts": {
     id: "routes/apps.checkout.invoice.$documentId";
@@ -151,7 +154,7 @@ type RouteFiles = {
   };
   "routes/app.tsx": {
     id: "routes/app";
-    page: "/app" | "/app/api/invoice-jobs/process" | "/app/pickup-settings" | "/app/api/variants" | "/app/promo-codes" | "/app/additional" | "/app/campaigns" | "/app/campaigns/:id" | "/app/invoice";
+    page: "/app" | "/app/api/invoice-jobs/process" | "/app/pickup-settings" | "/app/api/variants" | "/app/api/catalog" | "/app/promo-codes" | "/app/additional" | "/app/campaigns" | "/app/campaigns/:id" | "/app/invoice";
   };
   "routes/app.api.invoice-jobs.process.tsx": {
     id: "routes/app.api.invoice-jobs.process";
@@ -164,6 +167,10 @@ type RouteFiles = {
   "routes/app.api.variants.tsx": {
     id: "routes/app.api.variants";
     page: "/app/api/variants";
+  };
+  "routes/app.api.catalog.tsx": {
+    id: "routes/app.api.catalog";
+    page: "/app/api/catalog";
   };
   "routes/app.promo-codes.tsx": {
     id: "routes/app.promo-codes";
@@ -211,6 +218,7 @@ type RouteModules = {
   "routes/app.api.invoice-jobs.process": typeof import("./app/routes/app.api.invoice-jobs.process.tsx");
   "routes/app.pickup-settings": typeof import("./app/routes/app.pickup-settings.tsx");
   "routes/app.api.variants": typeof import("./app/routes/app.api.variants.tsx");
+  "routes/app.api.catalog": typeof import("./app/routes/app.api.catalog.tsx");
   "routes/app.promo-codes": typeof import("./app/routes/app.promo-codes.tsx");
   "routes/app.additional": typeof import("./app/routes/app.additional.tsx");
   "routes/app.campaigns": typeof import("./app/routes/app.campaigns.tsx");

@@ -1,7 +1,6 @@
 {% liquid
   assign all_products_url = routes.all_products_collection_url
   assign category_blocks = section.blocks | where: 'type', 'category'
-  assign default_categories = 'Gel Polish|Nail Tools|UV/LED Lamps|Nail Care|Decorations|Extensions|Kits' | split: '|'
 %}
 <section class="na-home-section na-home-categories">
   <div class="na-home-wrap">
@@ -43,18 +42,7 @@
           {% endif %}
         {% endfor %}
       {% else %}
-        {% for title in default_categories %}
-          {% assign fallback_link = search_url | append: '?q=' | append: title | url_encode %}
-          <a href="{{ fallback_link }}" class="na-category-card">
-            <div class="na-category-image"></div>
-            <div class="na-category-meta">
-              <p class="na-category-name">{{ title }}</p>
-              <span class="na-category-arrow" aria-hidden="true">
-                <svg viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"></path></svg>
-              </span>
-            </div>
-          </a>
-        {% endfor %}
+        <p class="na-home-empty-note">Add category blocks and pick collections.</p>
       {% endif %}
     </div>
   </div>

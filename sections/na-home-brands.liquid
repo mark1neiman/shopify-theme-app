@@ -2,7 +2,7 @@
   assign all_products_url = routes.all_products_collection_url
   assign brands_total = 0
   assign brands_initial = section.settings.brands_initial_visible | default: 20
-  assign fallback_brands = 'Molokom|Holy Molly|Belom|Imen|Imenka|Semilac|Indigo Nails|NeoNail|Gelish|OPI|CND Shellac|Kodi Professional|Komilfo|Oxxi Professional|Global Fashion|Siller Professional|Lovely|Naomi|FOX|Couture Colour|Moon Full|Podomonium|Staleks|Gehwol|Alessandro|LCN|IBD|Young Nails|Presto|Akzentz|Bio Sculpture|Light Elegance|Luxio|Aprés|Ugly Duckling|Orly|Essie|Zoya|LeChat|Revel Nail|Kiara Sky|DND|Modelones|Beetles|Makartt' | split: '|'
+  assign brand_blocks = section.blocks | where: 'type', 'brand'
 %}
 <section class="na-home-section na-home-brands">
   <div class="na-home-wrap">
@@ -12,17 +12,23 @@
     </div>
 
     <div class="na-home-brands-grid" data-na-home-brands-grid>
-      {% for vendor in shop.vendors limit: section.settings.brands_limit %}
-        {% assign brands_total = brands_total | plus: 1 %}
-        <a href="{{ routes.root_url }}collections/vendors?q={{ vendor | url_encode }}" class="na-home-brand-item{% if forloop.index > brands_initial %} na-home-brand-item--hidden{% endif %}">{{ vendor }}</a>
-      {% endfor %}
-
-      {% if brands_total == 0 %}
-        {% for vendor in fallback_brands limit: section.settings.brands_limit %}
+      {%- if brand_blocks.size > 0 -%}
+        {%- for block in brand_blocks -%}
+          {%- assign brand_label = block.settings.label -%}
+          {%- assign brand_link = block.settings.link -%}
+          {%- if brand_label != blank -%}
+            {% assign brands_total = brands_total | plus: 1 %}
+            <a href="{{ brand_link | default: routes.root_url }}" class="na-home-brand-item{% if brands_total > brands_initial %} na-home-brand-item--hidden{% endif %}" {{ block.shopify_attributes }}>
+              {{ brand_label }}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      {%- else -%}
+        {%- for vendor in shop.vendors limit: section.settings.brands_limit -%}
           {% assign brands_total = brands_total | plus: 1 %}
           <a href="{{ routes.root_url }}collections/vendors?q={{ vendor | url_encode }}" class="na-home-brand-item{% if forloop.index > brands_initial %} na-home-brand-item--hidden{% endif %}">{{ vendor }}</a>
-        {% endfor %}
-      {% endif %}
+        {%- endfor -%}
+      {%- endif -%}
     </div>
 
     {% if brands_total > brands_initial %}
@@ -63,6 +69,16 @@
     { "type": "text", "id": "show_all_prefix", "label": "Expand prefix", "default": "Show all" },
     { "type": "text", "id": "show_all_suffix", "label": "Expand suffix", "default": "brands" },
     { "type": "text", "id": "show_less_label", "label": "Collapse label", "default": "Show less" }
+  ],
+  "blocks": [
+    {
+      "type": "brand",
+      "name": "Brand",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Brand name", "default": "Holy Molly" },
+        { "type": "url", "id": "link", "label": "Custom link (optional)" }
+      ]
+    }
   ],
   "presets": [
     { "name": "NA Home Brands" }

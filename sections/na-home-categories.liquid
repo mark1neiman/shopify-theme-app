@@ -1,0 +1,84 @@
+{% liquid
+  assign all_products_url = routes.all_products_collection_url
+  assign category_blocks = section.blocks | where: 'type', 'category'
+  assign default_categories = 'Gel Polish|Nail Tools|UV/LED Lamps|Nail Care|Decorations|Extensions|Kits' | split: '|'
+%}
+<section class="na-home-section na-home-categories">
+  <div class="na-home-wrap">
+    {% if section.settings.heading != blank %}
+      <h2 class="na-home-section-title">{{ section.settings.heading }}</h2>
+    {% endif %}
+    <div class="na-home-categories-grid">
+      {% if category_blocks.size > 0 %}
+        {% for block in category_blocks %}
+          {% assign category_collection = block.settings.collection %}
+          {% assign category_title = block.settings.label %}
+          {% assign category_link = block.settings.link %}
+          {% assign category_image = block.settings.image %}
+          {% if category_collection != blank %}
+            {% if category_title == blank %}
+              {% assign category_title = category_collection.title %}
+            {% endif %}
+            {% if category_link == blank %}
+              {% assign category_link = category_collection.url %}
+            {% endif %}
+            {% if category_image == blank %}
+              {% assign category_image = category_collection.featured_image | default: category_collection.products.first.featured_image %}
+            {% endif %}
+          {% endif %}
+          {% if category_title != blank %}
+            <a href="{{ category_link | default: all_products_url }}" class="na-category-card" {{ block.shopify_attributes }}>
+              <div class="na-category-image">
+                {% if category_image != blank %}
+                  {{ category_image | image_url: width: 560 | image_tag: loading: 'lazy', widths: '220,320,420,560', alt: category_title }}
+                {% endif %}
+              </div>
+              <div class="na-category-meta">
+                <p class="na-category-name">{{ category_title }}</p>
+                <span class="na-category-arrow" aria-hidden="true">
+                  <svg viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"></path></svg>
+                </span>
+              </div>
+            </a>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {% for title in default_categories %}
+          <a href="{{ all_products_url }}" class="na-category-card">
+            <div class="na-category-image"></div>
+            <div class="na-category-meta">
+              <p class="na-category-name">{{ title }}</p>
+              <span class="na-category-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"></path></svg>
+              </span>
+            </div>
+          </a>
+        {% endfor %}
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "NA Home Categories",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Shop by category" }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "label", "label": "Custom label" },
+        { "type": "url", "id": "link", "label": "Custom link" },
+        { "type": "image_picker", "id": "image", "label": "Custom image" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "NA Home Categories" }
+  ]
+}
+{% endschema %}

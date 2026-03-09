@@ -2,8 +2,6 @@
   assign all_products_url = routes.all_products_collection_url
   assign account_register_url = routes.account_register_url
   assign promo_code = section.settings.promo_code | default: 'NAIL20'
-  assign category_blocks = section.blocks | where: 'type', 'category'
-  assign default_categories = 'Gel Polish|Nail Tools|UV/LED Lamps|Nail Care|Decorations|Extensions|Kits' | split: '|'
 %}
 
 <section class="na-home-section na-home-hero">
@@ -253,18 +251,7 @@
     { "type": "range", "id": "countdown_minutes", "label": "Countdown minutes", "min": 0, "max": 59, "step": 1, "default": 23 },
     { "type": "range", "id": "countdown_seconds", "label": "Countdown seconds", "min": 0, "max": 59, "step": 1, "default": 48 }
   ],
-  "blocks": [
-    {
-      "type": "category",
-      "name": "Category",
-      "settings": [
-        { "type": "collection", "id": "collection", "label": "Collection" },
-        { "type": "text", "id": "label", "label": "Custom label" },
-        { "type": "url", "id": "link", "label": "Custom link" },
-        { "type": "image_picker", "id": "image", "label": "Custom image" }
-      ]
-    }
-  ],
+  "blocks": [],
   "presets": [
     { "name": "NA Home Hero" }
   ]

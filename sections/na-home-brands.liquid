@@ -2,6 +2,7 @@
   assign all_products_url = routes.all_products_collection_url
   assign brands_total = 0
   assign brands_initial = section.settings.brands_initial_visible | default: 20
+  assign fallback_brands = 'Molokom|Holy Molly|Belom|Imen|Imenka|Semilac|Indigo Nails|NeoNail|Gelish|OPI|CND Shellac|Kodi Professional|Komilfo|Oxxi Professional|Global Fashion|Siller Professional|Lovely|Naomi|FOX|Couture Colour|Moon Full|Podomonium|Staleks|Gehwol|Alessandro|LCN|IBD|Young Nails|Presto|Akzentz|Bio Sculpture|Light Elegance|Luxio|Aprés|Ugly Duckling|Orly|Essie|Zoya|LeChat|Revel Nail|Kiara Sky|DND|Modelones|Beetles|Makartt' | split: '|'
 %}
 <section class="na-home-section na-home-brands">
   <div class="na-home-wrap">
@@ -15,6 +16,13 @@
         {% assign brands_total = brands_total | plus: 1 %}
         <a href="{{ routes.root_url }}collections/vendors?q={{ vendor | url_encode }}" class="na-home-brand-item{% if forloop.index > brands_initial %} na-home-brand-item--hidden{% endif %}">{{ vendor }}</a>
       {% endfor %}
+
+      {% if brands_total == 0 %}
+        {% for vendor in fallback_brands limit: section.settings.brands_limit %}
+          {% assign brands_total = brands_total | plus: 1 %}
+          <span class="na-home-brand-item{% if forloop.index > brands_initial %} na-home-brand-item--hidden{% endif %}">{{ vendor }}</span>
+        {% endfor %}
+      {% endif %}
     </div>
 
     {% if brands_total > brands_initial %}

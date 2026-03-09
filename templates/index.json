@@ -4,6 +4,10 @@
       "type": "na-home-hero",
       "settings": {}
     },
+    "na_home_categories": {
+      "type": "na-home-categories",
+      "settings": {}
+    },
     "na_home_brands": {
       "type": "na-home-brands",
       "settings": {}
@@ -35,6 +39,7 @@
   },
   "order": [
     "na_home_hero",
+    "na_home_categories",
     "na_home_brands",
     "na_home_latest_products",
     "na_home_collection_tiles",

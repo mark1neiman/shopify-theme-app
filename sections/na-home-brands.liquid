@@ -20,7 +20,7 @@
       {% if brands_total == 0 %}
         {% for vendor in fallback_brands limit: section.settings.brands_limit %}
           {% assign brands_total = brands_total | plus: 1 %}
-          <span class="na-home-brand-item{% if forloop.index > brands_initial %} na-home-brand-item--hidden{% endif %}">{{ vendor }}</span>
+          <a href="{{ routes.root_url }}collections/vendors?q={{ vendor | url_encode }}" class="na-home-brand-item{% if forloop.index > brands_initial %} na-home-brand-item--hidden{% endif %}">{{ vendor }}</a>
         {% endfor %}
       {% endif %}
     </div>

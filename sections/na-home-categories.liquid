@@ -44,7 +44,8 @@
         {% endfor %}
       {% else %}
         {% for title in default_categories %}
-          <a href="{{ all_products_url }}" class="na-category-card">
+          {% assign fallback_link = search_url | append: '?q=' | append: title | url_encode %}
+          <a href="{{ fallback_link }}" class="na-category-card">
             <div class="na-category-image"></div>
             <div class="na-category-meta">
               <p class="na-category-name">{{ title }}</p>

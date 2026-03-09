@@ -1,0 +1,63 @@
+{% liquid
+  assign all_products_url = routes.all_products_collection_url
+  assign brands_total = 0
+  assign brands_initial = section.settings.brands_initial_visible | default: 20
+%}
+<section class="na-home-section na-home-brands">
+  <div class="na-home-wrap">
+    <div class="na-home-brands-header">
+      <h2 class="na-home-brands-title">{{ section.settings.heading }}</h2>
+      <a href="{{ section.settings.view_all_link | default: all_products_url }}" class="na-home-view-all">{{ section.settings.view_all_label }}</a>
+    </div>
+
+    <div class="na-home-brands-grid" data-na-home-brands-grid>
+      {% for vendor in shop.vendors limit: section.settings.brands_limit %}
+        {% assign brands_total = brands_total | plus: 1 %}
+        <a href="{{ routes.root_url }}collections/vendors?q={{ vendor | url_encode }}" class="na-home-brand-item{% if forloop.index > brands_initial %} na-home-brand-item--hidden{% endif %}">{{ vendor }}</a>
+      {% endfor %}
+    </div>
+
+    {% if brands_total > brands_initial %}
+      <div class="na-home-brands-toggle-wrap">
+        <button type="button" class="na-home-brands-toggle" data-na-home-brands-toggle data-label-expand="{{ section.settings.show_all_prefix }} {{ brands_total }} {{ section.settings.show_all_suffix }}" data-label-collapse="{{ section.settings.show_less_label }}">{{ section.settings.show_all_prefix }} {{ brands_total }} {{ section.settings.show_all_suffix }}</button>
+      </div>
+    {% endif %}
+  </div>
+
+  <script>
+    (function () {
+      var section = document.currentScript && document.currentScript.closest('.na-home-section');
+      if (!section || section.dataset.naHomeBrandsInit === 'true') return;
+      section.dataset.naHomeBrandsInit = 'true';
+      var grid = section.querySelector('[data-na-home-brands-grid]');
+      var toggle = section.querySelector('[data-na-home-brands-toggle]');
+      if (!grid || !toggle) return;
+      var expanded = false;
+      var expandLabel = toggle.getAttribute('data-label-expand') || toggle.textContent;
+      var collapseLabel = toggle.getAttribute('data-label-collapse') || 'Show less';
+      toggle.addEventListener('click', function () {
+        expanded = !expanded;
+        grid.classList.toggle('is-expanded', expanded);
+        toggle.textContent = expanded ? collapseLabel : expandLabel;
+      });
+    })();
+  </script>
+</section>
+{% schema %}
+{
+  "name": "NA Home Brands",
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Our Brands" },
+    { "type": "text", "id": "view_all_label", "label": "View all label", "default": "View All" },
+    { "type": "url", "id": "view_all_link", "label": "View all link" },
+    { "type": "range", "id": "brands_limit", "label": "Max brands shown", "min": 8, "max": 120, "step": 1, "default": 48 },
+    { "type": "range", "id": "brands_initial_visible", "label": "Visible before expand", "min": 4, "max": 60, "step": 1, "default": 20 },
+    { "type": "text", "id": "show_all_prefix", "label": "Expand prefix", "default": "Show all" },
+    { "type": "text", "id": "show_all_suffix", "label": "Expand suffix", "default": "brands" },
+    { "type": "text", "id": "show_less_label", "label": "Collapse label", "default": "Show less" }
+  ],
+  "presets": [
+    { "name": "NA Home Brands" }
+  ]
+}
+{% endschema %}

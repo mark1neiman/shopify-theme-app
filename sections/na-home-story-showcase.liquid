@@ -1,0 +1,116 @@
+{% liquid
+  assign fact_blocks = section.blocks | where: 'type', 'fact_item'
+  assign showcase_blocks = section.blocks | where: 'type', 'showcase_image'
+  assign all_products_url = routes.all_products_collection_url
+%}
+<section class="na-home-section na-home-story-showcase">
+  <div class="na-home-wrap">
+    <div class="na-home-editorial-grid">
+      <article class="na-home-story">
+        <div class="na-home-story-content">
+          <p class="na-home-story-label">{{ section.settings.story_label }}</p>
+          <h3 class="na-home-story-title">{{ section.settings.story_title | escape | newline_to_br }}</h3>
+          <p class="na-home-story-text">{{ section.settings.story_text }}</p>
+          <a href="{{ section.settings.story_link | default: routes.root_url }}" class="na-home-story-link">{{ section.settings.story_link_label }}</a>
+        </div>
+        <div class="na-home-story-media">
+          {% if section.settings.story_image != blank %}
+            {{ section.settings.story_image | image_url: width: 900 | image_tag: loading: 'lazy', widths: '300,500,700,900', alt: section.settings.story_title }}
+          {% endif %}
+        </div>
+      </article>
+
+      <article class="na-home-facts">
+        <p class="na-home-facts-label">{{ section.settings.facts_heading }}</p>
+        <div class="na-home-facts-grid">
+          {% if fact_blocks.size > 0 %}
+            {% for block in fact_blocks %}
+              <div {{ block.shopify_attributes }}>
+                <p class="na-home-fact-num">{{ block.settings.value }}</p>
+                <p class="na-home-fact-label">{{ block.settings.label }}</p>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div><p class="na-home-fact-num">500+</p><p class="na-home-fact-label">Professional Products</p></div>
+            <div><p class="na-home-fact-num">25K+</p><p class="na-home-fact-label">Salon Partners</p></div>
+            <div><p class="na-home-fact-num">15+</p><p class="na-home-fact-label">European Countries</p></div>
+            <div><p class="na-home-fact-num">99%</p><p class="na-home-fact-label">Customer Satisfaction</p></div>
+          {% endif %}
+        </div>
+      </article>
+    </div>
+
+    <div class="na-home-showcase-box" style="margin-top: 24px;">
+      <h2 class="na-home-showcase-title">{{ section.settings.showcase_heading }}</h2>
+      <p class="na-home-showcase-text">{{ section.settings.showcase_text_prefix }} <span>{{ section.settings.showcase_tag }}</span> {{ section.settings.showcase_text_suffix }}</p>
+      <div class="na-home-showcase-grid">
+        {% if showcase_blocks.size > 0 %}
+          {% for block in showcase_blocks %}
+            <a href="{{ block.settings.link | default: routes.root_url }}" class="na-home-showcase-item" {{ block.shopify_attributes }}>
+              {% if block.settings.image != blank %}
+                {{ block.settings.image | image_url: width: 600 | image_tag: loading: 'lazy', widths: '200,300,400,600', alt: block.settings.alt | default: section.settings.showcase_heading }}
+              {% endif %}
+            </a>
+          {% endfor %}
+        {% else %}
+          {% for i in (1..6) %}<div class="na-home-showcase-item"></div>{% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="na-home-promo-dual-grid" style="margin-top: 24px;">
+      <article class="na-home-promo-dual-card{% if section.settings.promo_dual_1_image != blank %} has-image{% endif %}" {% if section.settings.promo_dual_1_image != blank %}style="background-image: url('{{ section.settings.promo_dual_1_image | image_url: width: 1400 }}');"{% endif %}>
+        <div class="na-home-banner-card-content">
+          <h3 class="na-home-banner-card-title">{{ section.settings.promo_dual_1_title | escape | newline_to_br }}</h3>
+          <a href="{{ section.settings.promo_dual_1_link | default: all_products_url }}" class="na-home-pill-btn na-home-btn-soft" style="margin-top: 14px;">{{ section.settings.promo_dual_button_label }}</a>
+        </div>
+      </article>
+
+      <article class="na-home-promo-dual-card{% if section.settings.promo_dual_2_image != blank %} has-image{% endif %}" {% if section.settings.promo_dual_2_image != blank %}style="background-image: url('{{ section.settings.promo_dual_2_image | image_url: width: 1400 }}');"{% endif %}>
+        <div class="na-home-banner-card-content">
+          <h3 class="na-home-banner-card-title">{{ section.settings.promo_dual_2_title | escape | newline_to_br }}</h3>
+          <a href="{{ section.settings.promo_dual_2_link | default: all_products_url }}" class="na-home-pill-btn na-home-btn-soft" style="margin-top: 14px;">{{ section.settings.promo_dual_button_label }}</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "NA Story + Showcase",
+  "settings": [
+    { "type": "text", "id": "story_label", "label": "Story label", "default": "The nanails story" },
+    { "type": "textarea", "id": "story_title", "label": "Story title", "default": "Quality\nStandards" },
+    { "type": "textarea", "id": "story_text", "label": "Story text", "default": "European-made formulas with salon-grade performance. Trusted by professionals." },
+    { "type": "text", "id": "story_link_label", "label": "Story link label", "default": "Read more ->" },
+    { "type": "url", "id": "story_link", "label": "Story link" },
+    { "type": "image_picker", "id": "story_image", "label": "Story image" },
+    { "type": "text", "id": "facts_heading", "label": "Facts heading", "default": "Company facts" },
+    { "type": "text", "id": "showcase_heading", "label": "Showcase heading", "default": "Showcase Us" },
+    { "type": "text", "id": "showcase_text_prefix", "label": "Showcase text prefix", "default": "Share your work using" },
+    { "type": "text", "id": "showcase_tag", "label": "Showcase hashtag", "default": "#nanails" },
+    { "type": "text", "id": "showcase_text_suffix", "label": "Showcase text suffix", "default": "and get featured" },
+    { "type": "text", "id": "promo_dual_button_label", "label": "Promo button label", "default": "Shop Now" },
+    { "type": "textarea", "id": "promo_dual_1_title", "label": "Promo 1 title", "default": "Gel Collection\nEssentials" },
+    { "type": "image_picker", "id": "promo_dual_1_image", "label": "Promo 1 image" },
+    { "type": "url", "id": "promo_dual_1_link", "label": "Promo 1 link" },
+    { "type": "textarea", "id": "promo_dual_2_title", "label": "Promo 2 title", "default": "25% Off\nCare Products" },
+    { "type": "image_picker", "id": "promo_dual_2_image", "label": "Promo 2 image" },
+    { "type": "url", "id": "promo_dual_2_link", "label": "Promo 2 link" }
+  ],
+  "blocks": [
+    { "type": "fact_item", "name": "Fact item", "settings": [
+      { "type": "text", "id": "value", "label": "Value", "default": "500+" },
+      { "type": "text", "id": "label", "label": "Label", "default": "Professional Products" }
+    ]},
+    { "type": "showcase_image", "name": "Showcase image", "settings": [
+      { "type": "image_picker", "id": "image", "label": "Image" },
+      { "type": "text", "id": "alt", "label": "Alt text" },
+      { "type": "url", "id": "link", "label": "Link" }
+    ]}
+  ],
+  "presets": [
+    { "name": "NA Story + Showcase" }
+  ]
+}
+{% endschema %}

@@ -1,11 +1,46 @@
 {
   "sections": {
-    "home_react_main": {
-      "type": "home-react",
+    "na_home_hero": {
+      "type": "na-home-hero",
+      "settings": {}
+    },
+    "na_home_brands": {
+      "type": "na-home-brands",
+      "settings": {}
+    },
+    "na_home_latest_products": {
+      "type": "na-home-latest-products",
+      "settings": {}
+    },
+    "na_home_collection_tiles": {
+      "type": "na-home-collection-tiles",
+      "settings": {}
+    },
+    "na_home_featured_shop": {
+      "type": "na-home-featured-shop",
+      "settings": {}
+    },
+    "na_home_story_showcase": {
+      "type": "na-home-story-showcase",
+      "settings": {}
+    },
+    "na_home_discovery": {
+      "type": "na-home-discovery",
+      "settings": {}
+    },
+    "na_home_blog_newsletter": {
+      "type": "na-home-blog-newsletter",
       "settings": {}
     }
   },
   "order": [
-    "home_react_main"
+    "na_home_hero",
+    "na_home_brands",
+    "na_home_latest_products",
+    "na_home_collection_tiles",
+    "na_home_featured_shop",
+    "na_home_story_showcase",
+    "na_home_discovery",
+    "na_home_blog_newsletter"
   ]
 }

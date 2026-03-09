@@ -1,0 +1,121 @@
+{% liquid
+  assign selected_blog = blogs[section.settings.blog_source]
+  if selected_blog == blank
+    assign selected_blog = blogs['news']
+  endif
+  assign blog_url = routes.root_url | append: 'blogs/news'
+  if selected_blog != blank and selected_blog.url != blank
+    assign blog_url = selected_blog.url
+  endif
+%}
+<section class="na-home-section na-home-blog-newsletter">
+  <div class="na-home-wrap">
+    <div class="na-home-blog-header">
+      <div>
+        <p class="na-home-blog-kicker">{{ section.settings.blog_kicker }}</p>
+        <h2 class="na-home-blog-title">{{ section.settings.blog_heading }}</h2>
+      </div>
+      <a href="{{ blog_url }}" class="na-home-blog-link">{{ section.settings.blog_view_all_label }}</a>
+    </div>
+
+    {% if selected_blog != blank and selected_blog.articles_count > 0 %}
+      {% assign featured_article = selected_blog.articles[0] %}
+      {% assign secondary_article = selected_blog.articles[1] %}
+      <div class="na-home-blog-grid-top">
+        {% if featured_article != blank %}
+          <a href="{{ featured_article.url }}" class="na-home-blog-featured">
+            <span class="na-home-blog-chip na-home-blog-chip--light">{{ featured_article.tags.first | default: section.settings.blog_default_tag }}</span>
+            <p class="na-home-blog-featured-date">{{ featured_article.published_at | date: "%b %d, %Y" }}</p>
+            <h3 class="na-home-blog-featured-title">{{ featured_article.title }}</h3>
+            <p class="na-home-blog-featured-excerpt">{{ featured_article.excerpt_or_content | strip_html | truncate: 180 }}</p>
+            <span class="na-home-blog-featured-read">{{ section.settings.blog_read_label }}</span>
+          </a>
+        {% endif %}
+
+        {% if secondary_article != blank %}
+          <a href="{{ secondary_article.url }}" class="na-home-blog-secondary">
+            <div class="na-home-blog-secondary-media">
+              {% if secondary_article.image != blank %}
+                {{ secondary_article.image | image_url: width: 1200 | image_tag: loading: 'lazy', widths: '400,700,900,1200', alt: secondary_article.title }}
+              {% endif %}
+              <div class="na-home-blog-secondary-top">
+                <span class="na-home-blog-chip na-home-blog-chip--brown">{{ secondary_article.tags.first | default: section.settings.blog_default_tag }}</span>
+                <span class="na-home-blog-trending">{{ section.settings.blog_trending_label }}</span>
+              </div>
+            </div>
+            <div class="na-home-blog-secondary-body">
+              <div class="na-home-blog-secondary-meta">{{ secondary_article.published_at | date: "%b %d, %Y" }}</div>
+              <h4 class="na-home-blog-secondary-title">{{ secondary_article.title }}</h4>
+              <p class="na-home-blog-secondary-text">{{ secondary_article.excerpt_or_content | strip_html | truncate: 140 }}</p>
+              <span class="na-home-blog-secondary-footer">{{ section.settings.blog_secondary_read_label }}</span>
+            </div>
+          </a>
+        {% endif %}
+      </div>
+
+      <div class="na-home-blog-grid-bottom" style="margin-top: 16px;">
+        {% for article in selected_blog.articles offset: 2 limit: 2 %}
+          <a href="{{ article.url }}" class="na-home-blog-small">
+            <div class="na-home-blog-small-media{% if forloop.index == 1 %} na-home-blog-small-media--business{% endif %}">
+              <span class="na-home-blog-small-number">0{{ forloop.index | plus: 2 }}</span>
+            </div>
+            <div class="na-home-blog-small-body">
+              <div class="na-home-blog-small-meta">
+                <span class="na-home-blog-chip {% if forloop.index == 1 %}na-home-blog-small-cat--business{% else %}na-home-blog-small-cat--default{% endif %}">{{ article.tags.first | default: section.settings.blog_default_tag }}</span>
+                <span style="margin-left: 8px;">{{ article.published_at | date: "%b %d, %Y" }}</span>
+              </div>
+              <h4 class="na-home-blog-small-title">{{ article.title }}</h4>
+              <p class="na-home-blog-small-text">{{ article.excerpt_or_content | strip_html | truncate: 130 }}</p>
+              <span class="na-home-blog-small-read">{{ section.settings.blog_read_label }}</span>
+            </div>
+          </a>
+        {% endfor %}
+      </div>
+    {% else %}
+      <p class="na-home-empty-note">No articles found in selected blog.</p>
+    {% endif %}
+
+    <div style="margin-top: 32px;">
+      <div class="na-home-newsletter-box">
+        <div>
+          <h3 class="na-home-newsletter-title">{{ section.settings.newsletter_title }}</h3>
+          <p class="na-home-newsletter-text">{{ section.settings.newsletter_subtext }}</p>
+        </div>
+
+        {% form 'customer', class: 'na-home-newsletter-form' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <div class="na-home-newsletter-fields">
+            <input type="email" name="contact[email]" class="na-home-newsletter-input" placeholder="Enter your email" aria-label="Email" required>
+            <button type="submit" class="na-home-newsletter-btn">{{ section.settings.newsletter_button_label }}</button>
+          </div>
+          {% if form.posted_successfully? %}
+            <p class="na-home-newsletter-alert">Thanks for subscribing.</p>
+          {% elsif form.errors %}
+            <p class="na-home-newsletter-alert">{{ form.errors | default_errors }}</p>
+          {% endif %}
+        {% endform %}
+      </div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "NA Blog + Newsletter",
+  "settings": [
+    { "type": "text", "id": "blog_kicker", "label": "Blog kicker", "default": "From the Blog" },
+    { "type": "text", "id": "blog_heading", "label": "Blog heading", "default": "News and Pro Tips" },
+    { "type": "blog", "id": "blog_source", "label": "Blog source" },
+    { "type": "text", "id": "blog_view_all_label", "label": "View all label", "default": "View All Articles ->" },
+    { "type": "text", "id": "blog_default_tag", "label": "Default tag", "default": "Education" },
+    { "type": "text", "id": "blog_trending_label", "label": "Trending label", "default": "Trending" },
+    { "type": "text", "id": "blog_read_label", "label": "Read label", "default": "Read article ->" },
+    { "type": "text", "id": "blog_secondary_read_label", "label": "Secondary read label", "default": "Read more" },
+    { "type": "text", "id": "newsletter_title", "label": "Newsletter title", "default": "Sign up for promotions" },
+    { "type": "text", "id": "newsletter_subtext", "label": "Newsletter subtext", "default": "Subscribe and save 15% on your first order" },
+    { "type": "text", "id": "newsletter_button_label", "label": "Newsletter button label", "default": "Subscribe" }
+  ],
+  "presets": [
+    { "name": "NA Blog + Newsletter" }
+  ]
+}
+{% endschema %}

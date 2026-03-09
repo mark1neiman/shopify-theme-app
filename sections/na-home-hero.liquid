@@ -1,0 +1,272 @@
+{% liquid
+  assign all_products_url = routes.all_products_collection_url
+  assign account_register_url = routes.account_register_url
+  assign promo_code = section.settings.promo_code | default: 'NAIL20'
+  assign category_blocks = section.blocks | where: 'type', 'category'
+  assign default_categories = 'Gel Polish|Nail Tools|UV/LED Lamps|Nail Care|Decorations|Extensions|Kits' | split: '|'
+%}
+
+<section class="na-home-section na-home-hero">
+  <div class="na-home-wrap">
+    <div class="na-home-hero-grid">
+      <article
+        class="na-home-hero-card na-home-hero-card--large{% if section.settings.hero_large_image != blank %} has-image{% endif %}"
+        {% if section.settings.hero_large_image != blank %}
+          style="background-image: url('{{ section.settings.hero_large_image | image_url: width: 1600 }}');"
+        {% endif %}
+      >
+        <div class="na-home-hero-large-content">
+          <p class="na-home-caption na-home-caption-muted">{{ section.settings.hero_kicker }}</p>
+          <h1 class="na-home-hero-title">{{ section.settings.hero_title | escape | newline_to_br }}</h1>
+          <a href="{{ section.settings.hero_button_link | default: all_products_url }}" class="na-home-pill-btn na-home-btn-dark">{{ section.settings.hero_button_label }}</a>
+        </div>
+      </article>
+
+      <article class="na-home-hero-card na-home-hero-card--tall{% if section.settings.members_image != blank %} has-image{% endif %}"
+        {% if section.settings.members_image != blank %}
+          style="background-image: url('{{ section.settings.members_image | image_url: width: 1200 }}');"
+        {% endif %}
+      >
+        <div class="na-home-hero-tall-inner">
+          <p class="na-home-caption" style="color: var(--na-color-10);">{{ section.settings.members_kicker }}</p>
+          <p class="na-home-hero-discount">{{ section.settings.members_discount }}</p>
+          <p class="na-home-hero-subtitle">{{ section.settings.members_subtitle }}</p>
+          <p class="na-home-hero-note">{{ section.settings.members_text }}</p>
+          <a href="{{ section.settings.members_button_link | default: account_register_url }}" class="na-home-pill-btn na-home-btn-dark">{{ section.settings.members_button_label }}</a>
+        </div>
+      </article>
+
+      <article class="na-home-hero-card na-home-hero-card--small top{% if section.settings.small_card_1_image != blank %} has-image{% endif %}"
+        {% if section.settings.small_card_1_image != blank %}
+          style="background-image: url('{{ section.settings.small_card_1_image | image_url: width: 1200 }}');"
+        {% endif %}
+      >
+        <div class="na-home-hero-small-content">
+          <div>
+            <p class="na-home-hero-subtitle" style="margin-bottom: 4px;">{{ section.settings.small_card_1_title }}</p>
+            <p class="na-home-caption-muted">{{ section.settings.small_card_1_text }}</p>
+          </div>
+          <a href="{{ section.settings.small_card_1_link | default: all_products_url }}" class="na-home-pill-btn na-home-btn-dark" style="width: fit-content; padding: 10px 20px;">{{ section.settings.small_card_button_label }}</a>
+        </div>
+      </article>
+
+      <article class="na-home-hero-card na-home-hero-card--small bottom{% if section.settings.small_card_2_image != blank %} has-image{% endif %}"
+        {% if section.settings.small_card_2_image != blank %}
+          style="background-image: url('{{ section.settings.small_card_2_image | image_url: width: 1200 }}');"
+        {% endif %}
+      >
+        <div class="na-home-hero-small-content">
+          <div>
+            <p class="na-home-hero-subtitle" style="margin-bottom: 4px;">{{ section.settings.small_card_2_title }}</p>
+            <p class="na-home-caption-muted">{{ section.settings.small_card_2_text }}</p>
+          </div>
+          <a href="{{ section.settings.small_card_2_link | default: all_products_url }}" class="na-home-pill-btn na-home-btn-dark" style="width: fit-content; padding: 10px 20px;">{{ section.settings.small_card_button_label }}</a>
+        </div>
+      </article>
+    </div>
+
+    <div class="na-home-promo">
+      <div class="na-home-promo-inner">
+        <div>
+          <p class="na-home-promo-label">{{ section.settings.promo_heading }}</p>
+          <div class="na-home-countdown" aria-label="{{ section.settings.promo_heading }}">
+            <span class="na-home-countdown-value" data-na-home-days>{{ section.settings.countdown_days | default: 3 | prepend: '0' | slice: -2, 2 }}</span>
+            <span class="na-home-countdown-sep">:</span>
+            <span class="na-home-countdown-value" data-na-home-hours>{{ section.settings.countdown_hours | default: 14 | prepend: '0' | slice: -2, 2 }}</span>
+            <span class="na-home-countdown-sep">:</span>
+            <span class="na-home-countdown-value" data-na-home-minutes>{{ section.settings.countdown_minutes | default: 23 | prepend: '0' | slice: -2, 2 }}</span>
+            <span class="na-home-countdown-sep">:</span>
+            <span class="na-home-countdown-value" data-na-home-seconds>{{ section.settings.countdown_seconds | default: 48 | prepend: '0' | slice: -2, 2 }}</span>
+          </div>
+        </div>
+
+        <p class="na-home-promo-desc">{{ section.settings.promo_text }}</p>
+
+        <button type="button" class="na-home-pill-btn na-home-copy-btn" data-na-home-copy>
+          <svg class="na-home-copy-icon" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+          <span data-na-home-copy-label>{{ section.settings.promo_copy_prefix }} {{ promo_code }}</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="na-home-categories">
+      <div class="na-home-categories-grid">
+        {% if category_blocks.size > 0 %}
+          {% for block in category_blocks %}
+            {% assign category_collection = block.settings.collection %}
+            {% assign category_title = block.settings.label %}
+            {% assign category_link = block.settings.link %}
+            {% assign category_image = block.settings.image %}
+            {% if category_collection != blank %}
+              {% if category_title == blank %}
+                {% assign category_title = category_collection.title %}
+              {% endif %}
+              {% if category_link == blank %}
+                {% assign category_link = category_collection.url %}
+              {% endif %}
+              {% if category_image == blank %}
+                {% assign category_image = category_collection.featured_image | default: category_collection.products.first.featured_image %}
+              {% endif %}
+            {% endif %}
+            {% if category_title != blank %}
+              <a href="{{ category_link | default: all_products_url }}" class="na-home-category-card" {{ block.shopify_attributes }}>
+                <div class="na-home-category-image">
+                  {% if category_image != blank %}
+                    {{ category_image | image_url: width: 560 | image_tag: loading: 'lazy', widths: '220,320,420,560', alt: category_title }}
+                  {% endif %}
+                </div>
+                <div class="na-home-category-meta">
+                  <p class="na-home-category-name">{{ category_title }}</p>
+                  <span class="na-home-category-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"></path></svg></span>
+                </div>
+              </a>
+            {% endif %}
+          {% endfor %}
+        {% else %}
+          {% for item in default_categories %}
+            <a href="{{ all_products_url }}" class="na-home-category-card">
+              <div class="na-home-category-image"></div>
+              <div class="na-home-category-meta">
+                <p class="na-home-category-name">{{ item }}</p>
+                <span class="na-home-category-arrow" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 18L15 12L9 6"></path></svg></span>
+              </div>
+            </a>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var section = document.currentScript && document.currentScript.closest('.na-home-section');
+      if (!section || section.dataset.naHomeHeroInit === 'true') return;
+      section.dataset.naHomeHeroInit = 'true';
+
+      var promoCode = {{ promo_code | json }};
+      var promoCopyPrefix = {{ section.settings.promo_copy_prefix | json }};
+      var copyButton = section.querySelector('[data-na-home-copy]');
+      var copyLabel = section.querySelector('[data-na-home-copy-label]');
+      var copiedTimeout;
+
+      if (copyButton && copyLabel) {
+        copyButton.addEventListener('click', function () {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(promoCode).catch(function () {});
+          }
+          copyLabel.textContent = 'Copied!';
+          window.clearTimeout(copiedTimeout);
+          copiedTimeout = window.setTimeout(function () {
+            copyLabel.textContent = promoCopyPrefix + ' ' + promoCode;
+          }, 2000);
+        });
+      }
+
+      var countdownDays = section.querySelector('[data-na-home-days]');
+      var countdownHours = section.querySelector('[data-na-home-hours]');
+      var countdownMinutes = section.querySelector('[data-na-home-minutes]');
+      var countdownSeconds = section.querySelector('[data-na-home-seconds]');
+      var timeLeft = {
+        days: {{ section.settings.countdown_days | default: 3 | json }},
+        hours: {{ section.settings.countdown_hours | default: 14 | json }},
+        minutes: {{ section.settings.countdown_minutes | default: 23 | json }},
+        seconds: {{ section.settings.countdown_seconds | default: 48 | json }}
+      };
+
+      function pad(n) {
+        return String(n).padStart(2, '0');
+      }
+
+      function renderCountdown() {
+        if (!countdownDays || !countdownHours || !countdownMinutes || !countdownSeconds) return;
+        countdownDays.textContent = pad(timeLeft.days);
+        countdownHours.textContent = pad(timeLeft.hours);
+        countdownMinutes.textContent = pad(timeLeft.minutes);
+        countdownSeconds.textContent = pad(timeLeft.seconds);
+      }
+
+      function tickCountdown() {
+        if (timeLeft.days <= 0 && timeLeft.hours <= 0 && timeLeft.minutes <= 0 && timeLeft.seconds <= 0) return;
+        timeLeft.seconds -= 1;
+        if (timeLeft.seconds < 0) {
+          timeLeft.seconds = 59;
+          timeLeft.minutes -= 1;
+        }
+        if (timeLeft.minutes < 0) {
+          timeLeft.minutes = 59;
+          timeLeft.hours -= 1;
+        }
+        if (timeLeft.hours < 0) {
+          timeLeft.hours = 23;
+          timeLeft.days -= 1;
+        }
+        if (timeLeft.days < 0) {
+          timeLeft.days = 0;
+          timeLeft.hours = 0;
+          timeLeft.minutes = 0;
+          timeLeft.seconds = 0;
+        }
+        renderCountdown();
+      }
+
+      renderCountdown();
+      window.setInterval(tickCountdown, 1000);
+    })();
+  </script>
+</section>
+
+{% schema %}
+{
+  "name": "NA Home Hero",
+  "settings": [
+    { "type": "header", "content": "Hero" },
+    { "type": "text", "id": "hero_kicker", "label": "Hero kicker", "default": "Spring '26 Collection" },
+    { "type": "textarea", "id": "hero_title", "label": "Hero title", "default": "Professional\nGel Polish" },
+    { "type": "image_picker", "id": "hero_large_image", "label": "Hero main image" },
+    { "type": "text", "id": "hero_button_label", "label": "Hero button label", "default": "Shop Collection" },
+    { "type": "url", "id": "hero_button_link", "label": "Hero button link" },
+    { "type": "header", "content": "Members card" },
+    { "type": "text", "id": "members_kicker", "label": "Members kicker", "default": "Members Only" },
+    { "type": "text", "id": "members_discount", "label": "Members discount", "default": "-20%" },
+    { "type": "text", "id": "members_subtitle", "label": "Members subtitle", "default": "on your first order" },
+    { "type": "textarea", "id": "members_text", "label": "Members text", "default": "Register at nanails.eu and get your personal discount on the entire catalog" },
+    { "type": "image_picker", "id": "members_image", "label": "Members image" },
+    { "type": "text", "id": "members_button_label", "label": "Members button label", "default": "Create Account" },
+    { "type": "url", "id": "members_button_link", "label": "Members button link" },
+    { "type": "header", "content": "Small cards" },
+    { "type": "text", "id": "small_card_1_title", "label": "Small card 1 title", "default": "Gel Colors" },
+    { "type": "text", "id": "small_card_1_text", "label": "Small card 1 text", "default": "Starting at €12.99" },
+    { "type": "image_picker", "id": "small_card_1_image", "label": "Small card 1 image" },
+    { "type": "url", "id": "small_card_1_link", "label": "Small card 1 link" },
+    { "type": "text", "id": "small_card_2_title", "label": "Small card 2 title", "default": "Nail Care" },
+    { "type": "text", "id": "small_card_2_text", "label": "Small card 2 text", "default": "Starting at €8.99" },
+    { "type": "image_picker", "id": "small_card_2_image", "label": "Small card 2 image" },
+    { "type": "url", "id": "small_card_2_link", "label": "Small card 2 link" },
+    { "type": "text", "id": "small_card_button_label", "label": "Small card button label", "default": "Shop" },
+    { "type": "header", "content": "Promo bar" },
+    { "type": "text", "id": "promo_heading", "label": "Promo heading", "default": "Limited Time Offer" },
+    { "type": "textarea", "id": "promo_text", "label": "Promo text", "default": "Use the code below to get your launch discount before the timer runs out." },
+    { "type": "text", "id": "promo_code", "label": "Promo code", "default": "NAIL20" },
+    { "type": "text", "id": "promo_copy_prefix", "label": "Promo button prefix", "default": "Copy code" },
+    { "type": "range", "id": "countdown_days", "label": "Countdown days", "min": 0, "max": 30, "step": 1, "default": 3 },
+    { "type": "range", "id": "countdown_hours", "label": "Countdown hours", "min": 0, "max": 23, "step": 1, "default": 14 },
+    { "type": "range", "id": "countdown_minutes", "label": "Countdown minutes", "min": 0, "max": 59, "step": 1, "default": 23 },
+    { "type": "range", "id": "countdown_seconds", "label": "Countdown seconds", "min": 0, "max": 59, "step": 1, "default": 48 }
+  ],
+  "blocks": [
+    {
+      "type": "category",
+      "name": "Category",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "label", "label": "Custom label" },
+        { "type": "url", "id": "link", "label": "Custom link" },
+        { "type": "image_picker", "id": "image", "label": "Custom image" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "NA Home Hero" }
+  ]
+}
+{% endschema %}

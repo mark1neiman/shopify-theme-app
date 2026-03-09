@@ -1,0 +1,125 @@
+{% liquid
+  assign favorites_collection = section.settings.favorites_collection
+  assign favorites_limit = section.settings.favorites_limit | default: 5
+  assign search_chip_blocks = section.blocks | where: 'type', 'search_chip'
+  assign trust_blocks = section.blocks | where: 'type', 'trust_item'
+  assign search_url = routes.search_url
+  assign fallback_searches = 'Gel Polish Sets|Builder Gel|Nail Lamp|French Tips|Nail Art Brushes|Base Coat|Top Coat|Cuticle Oil|Nail Stickers|Polygel Kit|Rubber Base|Chrome Powder' | split: '|'
+  if favorites_collection == blank
+    assign favorites_collection = collections['all']
+  endif
+%}
+<section class="na-home-section na-home-discovery">
+  <div class="na-home-wrap">
+    <div>
+      <h2 class="na-home-favorites-title" style="text-align:center; margin-bottom: 24px;">{{ section.settings.favorites_heading }}</h2>
+      <div class="na-home-favorites-grid">
+        {% for product in favorites_collection.products limit: favorites_limit %}
+          <div class="na-home-product-item">
+            {% render 'card-product', product: product, image_ratio: settings.pcard_image_ratio, section_index: section.index, index: forloop.index, quick_view_suffix: '-home-favorites', enable_quick_add: true, show_vendor: false %}
+          </div>
+        {% else %}
+          <p class="na-home-empty-note">No products in selected collection.</p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div style="margin-top: 40px; text-align: center;">
+      <h2 class="na-home-searches-title">{{ section.settings.searches_heading }}</h2>
+      <div class="na-home-search-cloud">
+        {% if search_chip_blocks.size > 0 %}
+          {% for block in search_chip_blocks %}
+            {% assign chip_url = block.settings.link %}
+            {% if chip_url == blank %}
+              {% assign chip_url = search_url | append: '?q=' | append: block.settings.label | url_encode %}
+            {% endif %}
+            <a href="{{ chip_url }}" class="na-home-search-chip" {{ block.shopify_attributes }}>{{ block.settings.label }}</a>
+          {% endfor %}
+        {% else %}
+          {% for term in fallback_searches %}
+            <a href="{{ search_url }}?q={{ term | url_encode }}" class="na-home-search-chip">{{ term }}</a>
+          {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+      <div class="na-home-wide-banner-box{% if section.settings.wide_banner_image != blank %} has-image{% endif %}" {% if section.settings.wide_banner_image != blank %}style="background-image: url('{{ section.settings.wide_banner_image | image_url: width: 1800 }}');"{% endif %}>
+        <div class="na-home-wide-banner-content">
+          <div>
+            <p class="na-home-wide-banner-kicker">{{ section.settings.wide_banner_kicker }}</p>
+            <h2 class="na-home-wide-banner-title">{{ section.settings.wide_banner_title | escape | newline_to_br }}</h2>
+            <p class="na-home-wide-banner-text">{{ section.settings.wide_banner_text }}</p>
+            <a href="{{ section.settings.wide_banner_button_link | default: routes.root_url }}" class="na-home-pill-btn na-home-btn-accent">{{ section.settings.wide_banner_button_label }}</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+      <div class="na-home-trust-grid">
+        {% if trust_blocks.size > 0 %}
+          {% for block in trust_blocks %}
+            <article class="na-home-trust-item" {{ block.shopify_attributes }}>
+              <span class="na-home-trust-icon" aria-hidden="true">
+                {% case block.settings.icon %}
+                  {% when 'secure' %}
+                    <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                  {% when 'returns' %}
+                    <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+                  {% when 'support' %}
+                    <svg viewBox="0 0 24 24"><path d="M4 15v-2a8 8 0 0 1 16 0v2"></path><rect x="2" y="14" width="4" height="6" rx="2"></rect><rect x="18" y="14" width="4" height="6" rx="2"></rect><path d="M18 20a4 4 0 0 1-4 4h-2"></path></svg>
+                  {% else %}
+                    <svg viewBox="0 0 24 24"><path d="M3 7h15l3 4v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"></path><path d="M16 19a4 4 0 0 0 0-8h-1"></path><path d="M3 11h10"></path></svg>
+                {% endcase %}
+              </span>
+              <h4 class="na-home-trust-title">{{ block.settings.title }}</h4>
+              <p class="na-home-trust-desc">{{ block.settings.text }}</p>
+            </article>
+          {% endfor %}
+        {% else %}
+          <article class="na-home-trust-item"><span class="na-home-trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 7h15l3 4v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"></path><path d="M16 19a4 4 0 0 0 0-8h-1"></path><path d="M3 11h10"></path></svg></span><h4 class="na-home-trust-title">Free Shipping</h4><p class="na-home-trust-desc">On orders over EUR 50</p></article>
+          <article class="na-home-trust-item"><span class="na-home-trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg></span><h4 class="na-home-trust-title">Secure Payment</h4><p class="na-home-trust-desc">SSL encrypted checkout</p></article>
+          <article class="na-home-trust-item"><span class="na-home-trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg></span><h4 class="na-home-trust-title">Easy Returns</h4><p class="na-home-trust-desc">30-day return policy</p></article>
+          <article class="na-home-trust-item"><span class="na-home-trust-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 15v-2a8 8 0 0 1 16 0v2"></path><rect x="2" y="14" width="4" height="6" rx="2"></rect><rect x="18" y="14" width="4" height="6" rx="2"></rect><path d="M18 20a4 4 0 0 1-4 4h-2"></path></svg></span><h4 class="na-home-trust-title">Expert Support</h4><p class="na-home-trust-desc">Professional advice 24/7</p></article>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% schema %}
+{
+  "name": "NA Discovery",
+  "settings": [
+    { "type": "text", "id": "favorites_heading", "label": "Favorites heading", "default": "Pro Favorites" },
+    { "type": "collection", "id": "favorites_collection", "label": "Favorites collection" },
+    { "type": "range", "id": "favorites_limit", "label": "Favorites product limit", "min": 3, "max": 20, "step": 1, "default": 5 },
+    { "type": "text", "id": "searches_heading", "label": "Searches heading", "default": "Explore Popular Searches" },
+    { "type": "text", "id": "wide_banner_kicker", "label": "Banner kicker", "default": "Access Exclusive Deals" },
+    { "type": "textarea", "id": "wide_banner_title", "label": "Banner title", "default": "Become a nanails\nProfessional Partner" },
+    { "type": "textarea", "id": "wide_banner_text", "label": "Banner text", "default": "Get wholesale pricing, priority shipping, and exclusive access to new collections." },
+    { "type": "image_picker", "id": "wide_banner_image", "label": "Banner image" },
+    { "type": "text", "id": "wide_banner_button_label", "label": "Banner button label", "default": "Apply Now" },
+    { "type": "url", "id": "wide_banner_button_link", "label": "Banner button link" }
+  ],
+  "blocks": [
+    { "type": "search_chip", "name": "Search chip", "settings": [
+      { "type": "text", "id": "label", "label": "Label", "default": "Gel Polish Sets" },
+      { "type": "url", "id": "link", "label": "Custom link" }
+    ]},
+    { "type": "trust_item", "name": "Trust item", "settings": [
+      { "type": "select", "id": "icon", "label": "Icon", "default": "shipping", "options": [
+        { "value": "shipping", "label": "Shipping" },
+        { "value": "secure", "label": "Secure" },
+        { "value": "returns", "label": "Returns" },
+        { "value": "support", "label": "Support" }
+      ]},
+      { "type": "text", "id": "title", "label": "Title", "default": "Free Shipping" },
+      { "type": "text", "id": "text", "label": "Description", "default": "On orders over EUR 50" }
+    ]}
+  ],
+  "presets": [
+    { "name": "NA Discovery" }
+  ]
+}
+{% endschema %}

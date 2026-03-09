@@ -1,0 +1,921 @@
+{% liquid
+  assign payment_methods_raw = section.settings.payment_methods | default: 'Visa|Mastercard|Apple Pay|Swedbank|SEB|LHV|Klix'
+  assign payment_methods = payment_methods_raw | split: '|'
+  assign trust_badges_raw = section.settings.trust_badges | default: 'SSL Secure|GDPR Compliant'
+  assign trust_badges = trust_badges_raw | split: '|'
+  assign copyright_text = section.settings.copyright_text | default: shop.name
+  assign shop_menu = section.settings.shop_menu
+  assign company_menu = section.settings.company_menu
+  assign support_menu = section.settings.support_menu
+  assign bottom_menu = section.settings.bottom_menu
+  assign instagram_link = settings.social_instagram_link
+  assign facebook_link = settings.social_facebook_link
+%}
+
+<footer id="na-footer-{{ section.id }}" class="na-footer">
+  <style>
+    #na-footer-{{ section.id }} {
+      --na-color-10: {{ section.settings.accent_color }};
+      background: {{ section.settings.footer_bg }};
+      color: {{ section.settings.footer_text }};
+      margin-top: 16px;
+      font-family: Inter, "Helvetica Neue", Arial, sans-serif;
+    }
+
+    #na-footer-{{ section.id }} *,
+    #na-footer-{{ section.id }} *::before,
+    #na-footer-{{ section.id }} *::after {
+      box-sizing: border-box;
+    }
+
+    #na-footer-{{ section.id }} a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    #na-footer-{{ section.id }} .na-wrap {
+      width: min(100%, 1415px);
+      margin: 0 auto;
+      padding-left: 16px;
+      padding-right: 16px;
+    }
+
+    #na-footer-{{ section.id }} .na-perks {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    #na-footer-{{ section.id }} .na-perks-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+
+    #na-footer-{{ section.id }} .na-perk {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #na-footer-{{ section.id }} .na-perk-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      color: var(--na-color-10);
+    }
+
+    #na-footer-{{ section.id }} .na-perk-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.7;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #na-footer-{{ section.id }} .na-perk-title {
+      margin: 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    #na-footer-{{ section.id }} .na-perk-desc {
+      margin: 2px 0 0;
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.35);
+    }
+
+    #na-footer-{{ section.id }} .na-main {
+      padding-top: 36px;
+      padding-bottom: 36px;
+    }
+
+    #na-footer-{{ section.id }} .na-main-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px;
+    }
+
+    #na-footer-{{ section.id }} .na-brand {
+      grid-column: 1 / -1;
+    }
+
+    #na-footer-{{ section.id }} .na-logo {
+      margin: 0 0 16px;
+      color: #fff;
+    }
+
+    #na-footer-{{ section.id }} .na-logo-fallback {
+      margin: 0;
+      font-size: 26px;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    #na-footer-{{ section.id }} .na-brand-text {
+      margin: 0 0 18px;
+      max-width: 320px;
+      color: rgba(255, 255, 255, 0.4);
+      font-size: 13px;
+      line-height: 1.75;
+    }
+
+    #na-footer-{{ section.id }} .na-socials {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    #na-footer-{{ section.id }} .na-social {
+      height: 40px;
+      padding: 0 14px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in srgb, var(--na-color-10) 25%, transparent);
+      background: color-mix(in srgb, var(--na-color-10) 15%, transparent);
+      color: var(--na-color-10);
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background-color 0.2s ease;
+    }
+
+    #na-footer-{{ section.id }} .na-social:hover {
+      background: color-mix(in srgb, var(--na-color-10) 25%, transparent);
+    }
+
+    #na-footer-{{ section.id }} .na-social svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #na-footer-{{ section.id }} .na-phone {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 16px;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    #na-footer-{{ section.id }} .na-phone:hover {
+      color: var(--na-color-10);
+    }
+
+    #na-footer-{{ section.id }} .na-phone-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--na-color-10) 15%, transparent);
+      border: 1px solid color-mix(in srgb, var(--na-color-10) 25%, transparent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--na-color-10);
+      flex-shrink: 0;
+    }
+
+    #na-footer-{{ section.id }} .na-phone-icon svg {
+      width: 14px;
+      height: 14px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.9;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #na-footer-{{ section.id }} .na-col-title {
+      margin: 0 0 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--na-color-10);
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    #na-footer-{{ section.id }} .na-links {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: grid;
+      gap: 10px;
+    }
+
+    #na-footer-{{ section.id }} .na-links a {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 13px;
+      transition: color 0.2s ease, transform 0.2s ease;
+      display: inline-block;
+    }
+
+    #na-footer-{{ section.id }} .na-links a:hover {
+      color: #fff;
+      transform: translateX(4px);
+    }
+
+    #na-footer-{{ section.id }} .na-contact-stack {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    #na-footer-{{ section.id }} .na-contact-item {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    #na-footer-{{ section.id }} .na-contact-item svg {
+      width: 14px;
+      height: 14px;
+      margin-top: 3px;
+      flex-shrink: 0;
+      color: rgba(255, 255, 255, 0.25);
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #na-footer-{{ section.id }} .na-news {
+      border-radius: 12px;
+      padding: 16px;
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    #na-footer-{{ section.id }} .na-news-title {
+      margin: 0 0 10px;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    #na-footer-{{ section.id }} .na-news-form {
+      display: flex;
+      gap: 8px;
+    }
+
+    #na-footer-{{ section.id }} .na-news-input {
+      flex: 1;
+      min-width: 0;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.06);
+      color: #fff;
+      padding: 0 14px;
+      font-size: 13px;
+      outline: none;
+    }
+
+    #na-footer-{{ section.id }} .na-news-input::placeholder {
+      color: rgba(255, 255, 255, 0.25);
+    }
+
+    #na-footer-{{ section.id }} .na-news-btn {
+      width: 40px;
+      height: 40px;
+      border: 0;
+      border-radius: 999px;
+      background: var(--na-color-10);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+
+    #na-footer-{{ section.id }} .na-news-btn:hover {
+      background: color-mix(in srgb, var(--na-color-10) 85%, #000);
+    }
+
+    #na-footer-{{ section.id }} .na-news-btn svg {
+      width: 16px;
+      height: 16px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #na-footer-{{ section.id }} .na-payments,
+    #na-footer-{{ section.id }} .na-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    #na-footer-{{ section.id }} .na-payments-row,
+    #na-footer-{{ section.id }} .na-bottom-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 16px;
+      padding-bottom: 16px;
+    }
+
+    #na-footer-{{ section.id }} .na-payment-list,
+    #na-footer-{{ section.id }} .na-badge-list {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #na-footer-{{ section.id }} .na-pill {
+      height: 26px;
+      padding: 0 10px;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    #na-footer-{{ section.id }} .na-pill--pay {
+      background: rgba(255, 255, 255, 0.05);
+      color: rgba(255, 255, 255, 0.3);
+      font-weight: 600;
+    }
+
+    #na-footer-{{ section.id }} .na-pill--safe {
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: rgba(255, 255, 255, 0.3);
+      gap: 6px;
+    }
+
+    #na-footer-{{ section.id }} .na-pill--safe svg {
+      width: 11px;
+      height: 11px;
+      fill: none;
+      stroke: color-mix(in srgb, var(--na-color-10) 60%, transparent);
+      stroke-width: 1.8;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    #na-footer-{{ section.id }} .na-copy {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.25);
+      font-size: 11px;
+    }
+
+    #na-footer-{{ section.id }} .na-bottom-links {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    #na-footer-{{ section.id }} .na-bottom-links a {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.25);
+      transition: color 0.2s ease;
+    }
+
+    #na-footer-{{ section.id }} .na-bottom-links a:hover {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    @media (min-width: 640px) {
+      #na-footer-{{ section.id }} .na-wrap {
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+
+      #na-footer-{{ section.id }} .na-perks-grid {
+        padding-top: 24px;
+        padding-bottom: 24px;
+      }
+
+      #na-footer-{{ section.id }} .na-main {
+        padding-top: 48px;
+        padding-bottom: 44px;
+      }
+
+      #na-footer-{{ section.id }} .na-logo-fallback {
+        font-size: 34px;
+      }
+
+      #na-footer-{{ section.id }} .na-brand-text,
+      #na-footer-{{ section.id }} .na-links a,
+      #na-footer-{{ section.id }} .na-contact-item {
+        font-size: 14px;
+      }
+
+      #na-footer-{{ section.id }} .na-news {
+        padding: 20px;
+      }
+
+      #na-footer-{{ section.id }} .na-copy,
+      #na-footer-{{ section.id }} .na-bottom-links a {
+        font-size: 12px;
+      }
+    }
+
+    @media (min-width: 768px) {
+      #na-footer-{{ section.id }} .na-perks-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 20px;
+      }
+
+      #na-footer-{{ section.id }} .na-main-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 30px;
+      }
+
+      #na-footer-{{ section.id }} .na-brand {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (min-width: 1024px) {
+      #na-footer-{{ section.id }} .na-main-grid {
+        grid-template-columns: 1.4fr 1fr 1fr 1fr 1.2fr;
+        gap: 40px;
+      }
+
+      #na-footer-{{ section.id }} .na-brand {
+        grid-column: auto;
+      }
+    }
+  </style>
+
+  {% if section.settings.show_perks %}
+    <div class="na-perks">
+      <div class="na-wrap">
+        <div class="na-perks-grid">
+          {% for block in section.blocks %}
+            {% if block.type == 'perk' %}
+              <div class="na-perk" {{ block.shopify_attributes }}>
+                <span class="na-perk-icon" aria-hidden="true">
+                  {% case block.settings.icon %}
+                    {% when 'shipping' %}
+                      <svg viewBox="0 0 24 24"><path d="M3 7h15l3 4v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z"></path><path d="M16 19a4 4 0 0 0 0-8h-1"></path><path d="M3 11h10"></path></svg>
+                    {% when 'secure' %}
+                      <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>
+                    {% when 'returns' %}
+                      <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+                    {% else %}
+                      <svg viewBox="0 0 24 24"><path d="M4 15v-2a8 8 0 0 1 16 0v2"></path><rect x="2" y="14" width="4" height="6" rx="2"></rect><rect x="18" y="14" width="4" height="6" rx="2"></rect><path d="M18 20a4 4 0 0 1-4 4h-2"></path></svg>
+                  {% endcase %}
+                </span>
+                <div>
+                  <p class="na-perk-title">{{ block.settings.title }}</p>
+                  <p class="na-perk-desc">{{ block.settings.description }}</p>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  {% endif %}
+
+  <div class="na-main">
+    <div class="na-wrap">
+      <div class="na-main-grid">
+        <div class="na-brand">
+          <div class="na-logo">
+            {% if section.settings.logo != blank %}
+              {{
+                section.settings.logo
+                | image_url: width: section.settings.logo_width
+                | image_tag:
+                  loading: 'lazy',
+                  widths: '120,160,200,240,280,320,360',
+                  width: section.settings.logo_width,
+                  alt: shop.name
+              }}
+            {% else %}
+              <h2 class="na-logo-fallback">{{ shop.name }}</h2>
+            {% endif %}
+          </div>
+          <p class="na-brand-text">{{ section.settings.brand_description }}</p>
+
+          <div class="na-socials">
+            {% if instagram_link != blank %}
+              <a class="na-social" href="{{ instagram_link }}" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+                <span>{{ section.settings.instagram_label }}</span>
+              </a>
+            {% endif %}
+            {% if facebook_link != blank %}
+              <a class="na-social" href="{{ facebook_link }}" target="_blank" rel="noopener noreferrer">
+                <svg viewBox="0 0 24 24"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+                <span>{{ section.settings.facebook_label }}</span>
+              </a>
+            {% endif %}
+          </div>
+
+          {% if section.settings.phone != blank %}
+            <a class="na-phone" href="tel:{{ section.settings.phone | replace: ' ', '' }}">
+              <span class="na-phone-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg></span>
+              <span>{{ section.settings.phone }}</span>
+            </a>
+          {% endif %}
+        </div>
+
+        <div>
+          <h3 class="na-col-title">{{ section.settings.shop_heading }}</h3>
+          <ul class="na-links">
+            {% if shop_menu != blank %}
+              {% for link in shop_menu.links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="na-col-title">{{ section.settings.company_heading }}</h3>
+          <ul class="na-links">
+            {% if company_menu != blank %}
+              {% for link in company_menu.links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="na-col-title">{{ section.settings.support_heading }}</h3>
+          <ul class="na-links">
+            {% if support_menu != blank %}
+              {% for link in support_menu.links %}
+                <li><a href="{{ link.url }}">{{ link.title }}</a></li>
+              {% endfor %}
+            {% endif %}
+          </ul>
+        </div>
+
+        <div>
+          <h3 class="na-col-title">{{ section.settings.contact_heading }}</h3>
+          <div class="na-contact-stack">
+            {% if section.settings.email != blank %}
+              <div class="na-contact-item">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16v16H4z"></path><path d="M22 6l-10 7L2 6"></path></svg>
+                <span>{{ section.settings.email }}</span>
+              </div>
+            {% endif %}
+            {% if section.settings.address != blank %}
+              <div class="na-contact-item">
+                <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                <span>{{ section.settings.address }}</span>
+              </div>
+            {% endif %}
+            {% if section.settings.working_hours != blank %}
+              <div class="na-contact-item">
+                <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+                <span>{{ section.settings.working_hours }}</span>
+              </div>
+            {% endif %}
+          </div>
+
+          <div class="na-news">
+            <p class="na-news-title">{{ section.settings.newsletter_heading }}</p>
+            {% form 'customer', class: 'na-news-form' %}
+              <input type="hidden" name="contact[tags]" value="newsletter">
+              <input class="na-news-input" type="email" name="contact[email]" placeholder="{{ section.settings.newsletter_placeholder }}" aria-label="Email" required>
+              <button class="na-news-btn" type="submit" aria-label="{{ section.settings.newsletter_button_aria }}">
+                <svg viewBox="0 0 24 24"><path d="M5 12h14"></path><path d="M13 5l7 7-7 7"></path></svg>
+              </button>
+            {% endform %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-payments">
+    <div class="na-wrap">
+      <div class="na-payments-row">
+        <div class="na-payment-list">
+          {% for method in payment_methods %}
+            <span class="na-pill na-pill--pay">{{ method | strip }}</span>
+          {% endfor %}
+        </div>
+        <div class="na-badge-list">
+          {% for badge in trust_badges %}
+            <span class="na-pill na-pill--safe"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V6l-8-4-8 4v6c0 6 8 10 8 10z"></path><path d="M9 12l2 2 4-4"></path></svg>{{ badge | strip }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="na-bottom">
+    <div class="na-wrap">
+      <div class="na-bottom-row">
+        <p class="na-copy">{{ copyright_text }}</p>
+        <div class="na-bottom-links">
+          {% if bottom_menu != blank %}
+            {% for link in bottom_menu.links %}
+              <a href="{{ link.url }}">{{ link.title }}</a>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer React",
+  "tag": "section",
+  "class": "section",
+  "max_blocks": 4,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "footer_bg",
+      "label": "Footer background",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "footer_text",
+      "label": "Footer text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent color",
+      "default": "#c8a08c"
+    },
+    {
+      "type": "header",
+      "content": "Brand"
+    },
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 80,
+      "max": 360,
+      "step": 10,
+      "unit": "px",
+      "label": "Logo width",
+      "default": 220
+    },
+    {
+      "type": "textarea",
+      "id": "brand_description",
+      "label": "Brand description",
+      "default": "Professional nail supplies for salons and beauty professionals across Europe. Quality you can trust."
+    },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Phone",
+      "default": "+372 5696 8888"
+    },
+    {
+      "type": "text",
+      "id": "instagram_label",
+      "label": "Instagram label",
+      "default": "Instagram"
+    },
+    {
+      "type": "text",
+      "id": "facebook_label",
+      "label": "Facebook label",
+      "default": "Facebook"
+    },
+    {
+      "type": "header",
+      "content": "Columns"
+    },
+    {
+      "type": "text",
+      "id": "shop_heading",
+      "label": "Shop heading",
+      "default": "Shop"
+    },
+    {
+      "type": "link_list",
+      "id": "shop_menu",
+      "label": "Shop menu"
+    },
+    {
+      "type": "text",
+      "id": "company_heading",
+      "label": "Company heading",
+      "default": "Company"
+    },
+    {
+      "type": "link_list",
+      "id": "company_menu",
+      "label": "Company menu"
+    },
+    {
+      "type": "text",
+      "id": "support_heading",
+      "label": "Support heading",
+      "default": "Support"
+    },
+    {
+      "type": "link_list",
+      "id": "support_menu",
+      "label": "Support menu"
+    },
+    {
+      "type": "text",
+      "id": "contact_heading",
+      "label": "Contact heading",
+      "default": "Get in Touch"
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email",
+      "default": "info@nanails.eu"
+    },
+    {
+      "type": "textarea",
+      "id": "address",
+      "label": "Address",
+      "default": "Parnu mnt 23, Tallinn, Estonia, 10141"
+    },
+    {
+      "type": "textarea",
+      "id": "working_hours",
+      "label": "Working hours",
+      "default": "Dispatch: Mon-Fri 09:00-17:00"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_heading",
+      "label": "Newsletter heading",
+      "default": "Subscribe for exclusive offers"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_placeholder",
+      "label": "Newsletter placeholder",
+      "default": "Your email"
+    },
+    {
+      "type": "text",
+      "id": "newsletter_button_aria",
+      "label": "Newsletter button label (aria)",
+      "default": "Subscribe"
+    },
+    {
+      "type": "header",
+      "content": "Bottom"
+    },
+    {
+      "type": "textarea",
+      "id": "payment_methods",
+      "label": "Payment methods (pipe-separated)",
+      "default": "Visa|Mastercard|Apple Pay|Swedbank|SEB|LHV|Klix"
+    },
+    {
+      "type": "textarea",
+      "id": "trust_badges",
+      "label": "Trust badges (pipe-separated)",
+      "default": "SSL Secure|GDPR Compliant"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "© 2026 nanails.eu - All rights reserved."
+    },
+    {
+      "type": "link_list",
+      "id": "bottom_menu",
+      "label": "Bottom links menu"
+    },
+    {
+      "type": "header",
+      "content": "Perks row"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_perks",
+      "label": "Show perks row",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "perk",
+      "name": "Perk",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "shipping",
+              "label": "Shipping"
+            },
+            {
+              "value": "secure",
+              "label": "Secure"
+            },
+            {
+              "value": "returns",
+              "label": "Returns"
+            },
+            {
+              "value": "support",
+              "label": "Support"
+            }
+          ],
+          "default": "shipping"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "Free Shipping"
+        },
+        {
+          "type": "text",
+          "id": "description",
+          "label": "Description",
+          "default": "On orders over EUR 50"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Footer React",
+      "blocks": [
+        {
+          "type": "perk",
+          "settings": {
+            "icon": "shipping",
+            "title": "Free Shipping",
+            "description": "On orders over EUR 50"
+          }
+        },
+        {
+          "type": "perk",
+          "settings": {
+            "icon": "secure",
+            "title": "EU Certified",
+            "description": "TPO-free, salon tested"
+          }
+        },
+        {
+          "type": "perk",
+          "settings": {
+            "icon": "returns",
+            "title": "Easy Returns",
+            "description": "30-day return policy"
+          }
+        },
+        {
+          "type": "perk",
+          "settings": {
+            "icon": "support",
+            "title": "Secure Payment",
+            "description": "SSL encrypted checkout"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
